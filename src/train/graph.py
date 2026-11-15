@@ -12,7 +12,8 @@ Each run writes
     results/graph/<name>.csv / .json                 per-horizon MAE / RMSE / MAPE (val + test), training history
 
 Training (both models): masked MAE on inverse-scaled speed, Adam, MultiStepLR, grad-norm clip 5, early stopping on
-validation masked MAE. Windows are shuffled only inside the train block. Test numbers are never used to choose anything.
+validation masked MAE (never before the last learning-rate milestone). Windows are shuffled only inside the train
+block. Test numbers are never used to choose anything.
 """
 from __future__ import annotations
 
@@ -43,6 +44,7 @@ class RunConfig:
     seed: int = 0
     graph: str = "bidirectional"        # STGAT edge variant (graph_layers.GRAPH_VARIANTS)
     gat_layers: int = 2
+    dropout: float = 0.1                # STGAT regularisation (GRU and attention-block dropout)
     supports: str = "dual"              # DCRNN: dual | forward | undirected
     k: int = 2                          # DCRNN diffusion hops
     hidden: int = 64
@@ -63,6 +65,7 @@ class RunConfig:
         if self.model == "stgat":
             parts += [] if self.graph == "bidirectional" else [self.graph]
             parts += [] if self.gat_layers == 2 else [f"{self.gat_layers}layer"]
+            parts += [] if self.dropout == 0.1 else [f"drop{self.dropout:g}"]
         else:
             parts += [] if self.supports == "dual" else [self.supports]
             parts += [] if self.k == 2 else [f"k{self.k}"]
@@ -78,7 +81,7 @@ def device() -> torch.device:
 def build_model(cfg: RunConfig, adj: np.ndarray) -> torch.nn.Module:
     if cfg.model == "stgat":
         ei, ea = road_graph(adj, cfg.graph, seed=cfg.seed)
-        return STGAT(ei, ea, hidden=cfg.hidden, gat_layers=cfg.gat_layers)
+        return STGAT(ei, ea, hidden=cfg.hidden, gat_layers=cfg.gat_layers, dropout=cfg.dropout)
     if cfg.model == "dcrnn":
         return DCRNN(diffusion_supports(adj, cfg.supports), units=cfg.hidden, k=cfg.k)
     raise ValueError(cfg.model)
@@ -147,7 +150,9 @@ def train(cfg: RunConfig, log=print) -> dict:
             torch.save(model.state_dict(), out_dir / "best.pt")
         else:
             bad += 1
-            if bad >= cfg.patience:
+            # never stop before the last learning-rate drop: at the high initial rate validation error is noisy
+            # (DCRNN at lr 0.01 spikes every few epochs), and stopping there skips the schedule's main gain
+            if bad >= cfg.patience and ep >= max(cfg.milestones):
                 break
     model.load_state_dict(torch.load(out_dir / "best.pt", map_location=dev))
     meta = {"config": asdict(cfg), "name": cfg.name, "parameters": n_params, "best_val_mae": best,

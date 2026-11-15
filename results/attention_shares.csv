@@ -1,0 +1,7 @@
+situation,attends_to,mean_share_pct,sensors
+slowdown ahead (30 min),self,11.81,163
+slowdown ahead (30 min),upstream neighbour,25.7,163
+slowdown ahead (30 min),downstream neighbour,62.48,163
+all other windows,self,16.47,163
+all other windows,upstream neighbour,31.53,163
+all other windows,downstream neighbour,52.0,163

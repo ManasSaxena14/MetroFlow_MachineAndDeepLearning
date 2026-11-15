@@ -114,4 +114,6 @@ def test_predict_rows_matches_target_row_layout():
 def test_run_names_are_unique_per_setting():
     names = {RunConfig(model="stgat", graph=g).name for g in ("bidirectional", "identity", "random")}
     names |= {RunConfig(model="dcrnn", k=k).name for k in (1, 2)} | {RunConfig(model="dcrnn", protocol="dcrnn").name}
-    assert len(names) == 6
+    names |= {RunConfig(model="stgat", dropout=0.0).name}
+    assert len(names) == 7
+    assert RunConfig(model="stgat").name == "stgat_s0"                  # defaults keep the existing run names

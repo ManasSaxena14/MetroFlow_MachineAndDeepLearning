@@ -1,0 +1,12 @@
+variant,run,parameters,epochs_run,MAE_15min,delta_15min_vs_main,MAE_30min,delta_30min_vs_main,MAE_60min,delta_60min_vs_main
+"STGAT, bidirectional edges (main)",stgat_s0,65420,40,2.838,0.0,3.32,0.0,3.955,0.0
+no graph (self-loops only),stgat_identity_s0,65420,37,2.967,0.128,3.547,0.227,4.351,0.397
+forward edges only (hear upstream),stgat_forward_s0,65420,40,2.896,0.057,3.397,0.077,4.052,0.097
+backward edges only (hear downstream),stgat_backward_s0,65420,40,2.861,0.023,3.368,0.048,4.021,0.067
+"undirected, no direction feature",stgat_undirected_s0,65420,40,2.864,0.026,3.368,0.048,4.043,0.088
+"random graph, same edge count",stgat_random_s0,65420,40,2.945,0.106,3.481,0.161,4.178,0.223
+1 attention layer instead of 2,stgat_1layer_s0,56716,40,2.869,0.03,3.388,0.068,4.108,0.153
+no dropout (regularisation off),stgat_drop0_s0,65420,40,2.831,-0.007,3.307,-0.013,3.925,-0.03
+"DCRNN, dual random walk, K = 2 (main)",dcrnn_s0,377153,30,2.642,0.0,3.05,0.0,3.568,0.0
+"DCRNN, K = 1 hop",dcrnn_k1_s0,226625,30,2.65,0.008,3.053,0.004,3.569,0.001
+"DCRNN, forward walk only",dcrnn_forward_s0,226625,30,2.774,0.132,3.191,0.141,3.723,0.155

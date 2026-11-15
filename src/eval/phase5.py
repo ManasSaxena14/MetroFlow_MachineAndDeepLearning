@@ -32,6 +32,7 @@ ABLATIONS = [  # (label, run, compared with)
     ("undirected, no direction feature", "stgat_undirected_s0", "stgat_s0"),
     ("random graph, same edge count", "stgat_random_s0", "stgat_s0"),
     ("1 attention layer instead of 2", "stgat_1layer_s0", "stgat_s0"),
+    ("no dropout (regularisation off)", "stgat_drop0_s0", "stgat_s0"),
     ("DCRNN, dual random walk, K = 2 (main)", "dcrnn_s0", "dcrnn_s0"),
     ("DCRNN, K = 1 hop", "dcrnn_k1_s0", "dcrnn_s0"),
     ("DCRNN, forward walk only", "dcrnn_forward_s0", "dcrnn_s0"),

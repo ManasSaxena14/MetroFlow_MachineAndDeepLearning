@@ -1,0 +1,43 @@
+{
+  "reference_check": null,
+  "attention_shares": [
+    {
+      "situation": "slowdown ahead (30 min)",
+      "attends_to": "self",
+      "mean_share_pct": 11.81,
+      "sensors": 163
+    },
+    {
+      "situation": "slowdown ahead (30 min)",
+      "attends_to": "upstream neighbour",
+      "mean_share_pct": 25.7,
+      "sensors": 163
+    },
+    {
+      "situation": "slowdown ahead (30 min)",
+      "attends_to": "downstream neighbour",
+      "mean_share_pct": 62.48,
+      "sensors": 163
+    },
+    {
+      "situation": "all other windows",
+      "attends_to": "self",
+      "mean_share_pct": 16.47,
+      "sensors": 163
+    },
+    {
+      "situation": "all other windows",
+      "attends_to": "upstream neighbour",
+      "mean_share_pct": 31.53,
+      "sensors": 163
+    },
+    {
+      "situation": "all other windows",
+      "attends_to": "downstream neighbour",
+      "mean_share_pct": 52.0,
+      "sensors": 163
+    }
+  ],
+  "slowdown_ahead_windows": 18955,
+  "sensors_shifting_downstream": 149
+}
