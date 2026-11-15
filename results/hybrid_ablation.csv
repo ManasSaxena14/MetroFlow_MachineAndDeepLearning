@@ -1,0 +1,5 @@
+variant,runs,MAE_15min,MAE_15min_std,MAE_30min,MAE_30min_std,MAE_60min,MAE_60min_std
+DCRNN alone,3,2.644,0.002,3.049,0.003,3.566,0.01
+Blend: w_h * DCRNN + (1 - w_h) * XGBoost,3,2.633,0.003,3.027,0.003,3.515,0.013
+"Residual corrector, all 46 features (deep trees)",3,2.637,0.007,3.068,0.011,3.62,0.004
+"Residual corrector, compact + regularised (main)",3,2.623,0.005,3.013,0.003,3.473,0.01

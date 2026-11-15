@@ -17,6 +17,7 @@ LOOK = {
     "XGBoost + neighbours": (S.BLUE, ":"),
     "STGAT (ours)": (S.ORANGE, "-"),
     "DCRNN": (S.AQUA, "-"),
+    "Hybrid: DCRNN + XGBoost (ours)": ("#4a3aa7", "-"),
 }
 
 

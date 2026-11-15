@@ -1,0 +1,40 @@
+model,run,baseline,minutes,baseline_mae,model_mae,gain_mph,gain_pct,ci95_low,ci95_high,p_bootstrap,dm_stat,p_dm,test_days,days_model_better
+STGAT (ours),stgat_s0,XGBoost per horizon,15,3.0155,2.8385,0.17701,5.8701,0.16519,0.19035,0,14.817,2.9559e-13,24,24
+STGAT (ours),stgat_s0,XGBoost per horizon,30,3.5096,3.32,0.18964,5.4034,0.17241,0.20882,0,17.926,5.185e-15,24,24
+STGAT (ours),stgat_s0,XGBoost per horizon,60,4.0064,3.9545,0.051892,1.2952,0.0087587,0.097867,0.0146,2.0373,0.053283,24,17
+STGAT (ours),stgat_s1,XGBoost per horizon,15,3.0155,2.8378,0.17766,5.8917,0.1655,0.19194,0,13.243,3.0187e-12,24,24
+STGAT (ours),stgat_s1,XGBoost per horizon,30,3.5096,3.3198,0.18983,5.4089,0.17297,0.20767,0,14.864,2.7696e-13,24,24
+STGAT (ours),stgat_s1,XGBoost per horizon,60,4.0064,3.9541,0.052356,1.3068,0.0075022,0.10126,0.0206,1.9716,0.060805,24,16
+STGAT (ours),stgat_s2,XGBoost per horizon,15,3.0155,2.8406,0.1749,5.8001,0.16212,0.18949,0,13.299,2.7686e-12,24,24
+STGAT (ours),stgat_s2,XGBoost per horizon,30,3.5096,3.3211,0.18851,5.3711,0.1719,0.20658,0,15.114,1.9524e-13,24,24
+STGAT (ours),stgat_s2,XGBoost per horizon,60,4.0064,3.9513,0.055167,1.377,0.012351,0.10198,0.011,2.1574,0.041661,24,16
+DCRNN,dcrnn_s0,XGBoost per horizon,15,3.0155,2.6417,0.37377,12.395,0.34105,0.40636,0,15.5,1.1482e-13,24,24
+DCRNN,dcrnn_s0,XGBoost per horizon,30,3.5096,3.0495,0.46011,13.11,0.41623,0.50215,0,15.567,1.0492e-13,24,24
+DCRNN,dcrnn_s0,XGBoost per horizon,60,4.0064,3.5681,0.43833,10.941,0.40643,0.47077,0,20.006,4.8042e-16,24,24
+DCRNN,dcrnn_s1,XGBoost per horizon,15,3.0155,2.6447,0.37081,12.297,0.33963,0.40207,0,15.587,1.0202e-13,24,24
+DCRNN,dcrnn_s1,XGBoost per horizon,30,3.5096,3.0515,0.45816,13.054,0.41929,0.49623,0,16.443,3.2902e-14,24,24
+DCRNN,dcrnn_s1,XGBoost per horizon,60,4.0064,3.5752,0.43128,10.765,0.39074,0.4708,0,16.053,5.4763e-14,24,24
+DCRNN,dcrnn_s2,XGBoost per horizon,15,3.0155,2.6453,0.37022,12.277,0.33904,0.40141,0,15.536,1.0935e-13,24,24
+DCRNN,dcrnn_s2,XGBoost per horizon,30,3.5096,3.0464,0.46326,13.199,0.4224,0.50272,0,16.325,3.8362e-14,24,24
+DCRNN,dcrnn_s2,XGBoost per horizon,60,4.0064,3.5559,0.45058,11.246,0.412,0.48845,0,15.384,1.3463e-13,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,XGBoost per horizon,15,3.0155,2.6183,0.39722,13.172,0.36463,0.43035,0,16.411,3.4293e-14,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,XGBoost per horizon,30,3.5096,3.0104,0.49921,14.224,0.45657,0.54059,0,17.424,9.5422e-15,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,XGBoost per horizon,60,4.0064,3.4708,0.53563,13.369,0.50282,0.56763,0,25.364,2.5756e-18,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,XGBoost per horizon,15,3.0155,2.6244,0.39105,12.968,0.35914,0.42318,0,16.095,5.1789e-14,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,XGBoost per horizon,30,3.5096,3.0161,0.49351,14.062,0.4541,0.53149,0,17.768,6.2683e-15,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,XGBoost per horizon,60,4.0064,3.4836,0.52281,13.049,0.48675,0.55782,0,21.74,7.7901e-17,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,XGBoost per horizon,15,3.0155,2.6276,0.38791,12.864,0.35604,0.41918,0,16.288,4.0242e-14,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,XGBoost per horizon,30,3.5096,3.0136,0.4961,14.135,0.45487,0.53546,0,17.919,5.2278e-15,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,XGBoost per horizon,60,4.0064,3.4648,0.54161,13.519,0.50512,0.57424,0,24.189,7.3793e-18,24,24
+XGBoost + neighbours,xgb_both,XGBoost per horizon,15,3.0155,2.9075,0.10795,3.5799,0.094137,0.12141,0,12.729,6.7469e-12,24,24
+XGBoost + neighbours,xgb_both,XGBoost per horizon,30,3.5096,3.4181,0.091527,2.6079,0.075937,0.10861,0,10.912,1.4368e-10,24,24
+XGBoost + neighbours,xgb_both,XGBoost per horizon,60,4.0064,3.9494,0.057023,1.4233,0.042632,0.072108,0,6.9196,4.7026e-07,24,23
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,DCRNN (same seed),15,2.6417,2.6183,0.023448,0.88762,0.021308,0.025554,0,20.014,4.7638e-16,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,DCRNN (same seed),30,3.0495,3.0104,0.039097,1.2821,0.034929,0.043556,0,14.953,2.4441e-13,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,DCRNN (same seed),60,3.5681,3.4708,0.0973,2.7269,0.085913,0.10838,0,13.422,2.293e-12,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,DCRNN (same seed),15,2.6447,2.6244,0.020234,0.76508,0.017765,0.022712,0,14.431,5.1274e-13,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,DCRNN (same seed),30,3.0515,3.0161,0.035347,1.1583,0.030646,0.040282,0,12.232,1.5062e-11,24,24
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,DCRNN (same seed),60,3.5752,3.4836,0.091523,2.56,0.077081,0.10619,0,8.9938,5.4352e-09,24,23
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,DCRNN (same seed),15,2.6453,2.6276,0.017685,0.66855,0.015827,0.019483,0,14.129,7.9568e-13,24,23
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,DCRNN (same seed),30,3.0464,3.0136,0.03284,1.078,0.028001,0.037817,0,11.798,3.0984e-11,24,23
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,DCRNN (same seed),60,3.5559,3.4648,0.09103,2.56,0.076647,0.1065,0,5.9077,5.063e-06,24,23

@@ -1,0 +1,61 @@
+model,minutes,group,mae,n
+Persistence,15,onset,17.8974,27023
+Persistence,15,normal,3.1728,1217811
+Persistence,30,onset,25.3452,27023
+Persistence,30,normal,3.7262,1217793
+Persistence,60,onset,27.1495,27023
+Persistence,60,normal,4.8827,1217757
+Historical average,15,onset,17.1331,27023
+Historical average,15,normal,4.1392,1217811
+Historical average,30,onset,17.1331,27023
+Historical average,30,normal,4.1393,1217793
+Historical average,60,onset,17.1331,27023
+Historical average,60,normal,4.1395,1217757
+Ridge per sensor,15,onset,17.9912,27023
+Ridge per sensor,15,normal,2.9883,1217811
+Ridge per sensor,30,onset,23.8260,27023
+Ridge per sensor,30,normal,3.6439,1217793
+Ridge per sensor,60,onset,23.7683,27023
+Ridge per sensor,60,normal,4.7593,1217757
+Multi-output Random Forest,15,onset,17.0924,27023
+Multi-output Random Forest,15,normal,2.7672,1217811
+Multi-output Random Forest,30,onset,22.3180,27023
+Multi-output Random Forest,30,normal,3.2651,1217793
+Multi-output Random Forest,60,onset,22.0763,27023
+Multi-output Random Forest,60,normal,4.0539,1217757
+LSTM (no graph),15,onset,18.0072,27023
+LSTM (no graph),15,normal,2.6389,1217811
+LSTM (no graph),30,onset,25.2141,27023
+LSTM (no graph),30,normal,3.0717,1217793
+LSTM (no graph),60,onset,27.1892,27023
+LSTM (no graph),60,normal,3.8446,1217757
+XGBoost per horizon,15,onset,16.1993,27023
+XGBoost per horizon,15,normal,2.7230,1217811
+XGBoost per horizon,30,onset,20.1156,27023
+XGBoost per horizon,30,normal,3.1412,1217793
+XGBoost per horizon,60,onset,19.0903,27023
+XGBoost per horizon,60,normal,3.6717,1217757
+XGBoost + neighbours,15,onset,14.4232,27023
+XGBoost + neighbours,15,normal,2.6520,1217811
+XGBoost + neighbours,30,onset,18.7659,27023
+XGBoost + neighbours,30,normal,3.0776,1217793
+XGBoost + neighbours,60,onset,18.8860,27023
+XGBoost + neighbours,60,normal,3.6180,1217757
+STGAT (ours),15,onset,15.5114,27023
+STGAT (ours),15,normal,2.5578,1217811
+STGAT (ours),30,onset,21.0704,27023
+STGAT (ours),30,normal,2.9264,1217793
+STGAT (ours),60,onset,23.5841,27023
+STGAT (ours),60,normal,3.5177,1217757
+DCRNN,15,onset,13.2810,27023
+DCRNN,15,normal,2.4079,1217811
+DCRNN,30,onset,18.2483,27023
+DCRNN,30,normal,2.7119,1217793
+DCRNN,60,onset,20.6788,27023
+DCRNN,60,normal,3.1866,1217757
+Hybrid: DCRNN + XGBoost (ours),15,onset,13.2900,27023
+Hybrid: DCRNN + XGBoost (ours),15,normal,2.3868,1217811
+Hybrid: DCRNN + XGBoost (ours),30,onset,18.1904,27023
+Hybrid: DCRNN + XGBoost (ours),30,normal,2.6766,1217793
+Hybrid: DCRNN + XGBoost (ours),60,onset,20.1663,27023
+Hybrid: DCRNN + XGBoost (ours),60,normal,3.1027,1217757

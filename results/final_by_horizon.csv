@@ -1,0 +1,193 @@
+model,run,horizon,mae,rmse,mape
+Persistence,persistence,1,2.8116,4.6138,6.4808
+Persistence,persistence,2,3.2037,5.6549,7.6854
+Persistence,persistence,3,3.4924,6.3901,8.5890
+Persistence,persistence,4,3.7428,6.9969,9.3827
+Persistence,persistence,5,3.9716,7.5240,10.1094
+Persistence,persistence,6,4.1955,8.0109,10.8161
+Persistence,persistence,7,4.4098,8.4569,11.4850
+Persistence,persistence,8,4.6139,8.8706,12.1322
+Persistence,persistence,9,4.8055,9.2507,12.7328
+Persistence,persistence,10,4.9962,9.6150,13.3130
+Persistence,persistence,11,5.1813,9.9596,13.8851
+Persistence,persistence,12,5.3661,10.2926,14.4753
+Historical average,hist_avg,1,4.4215,8.0772,13.9255
+Historical average,hist_avg,2,4.4214,8.0771,13.9254
+Historical average,hist_avg,3,4.4213,8.0771,13.9252
+Historical average,hist_avg,4,4.4213,8.0771,13.9251
+Historical average,hist_avg,5,4.4212,8.0771,13.9250
+Historical average,hist_avg,6,4.4214,8.0772,13.9254
+Historical average,hist_avg,7,4.4214,8.0773,13.9254
+Historical average,hist_avg,8,4.4214,8.0773,13.9255
+Historical average,hist_avg,9,4.4214,8.0773,13.9255
+Historical average,hist_avg,10,4.4215,8.0774,13.9256
+Historical average,hist_avg,11,4.4215,8.0774,13.9258
+Historical average,hist_avg,12,4.4216,8.0775,13.9259
+Ridge per sensor,ridge,1,2.6081,4.3005,6.4265
+Ridge per sensor,ridge,2,3.0023,5.2353,7.8252
+Ridge per sensor,ridge,3,3.3140,5.8767,8.9489
+Ridge per sensor,ridge,4,3.5921,6.3889,9.9526
+Ridge per sensor,ridge,5,3.8444,6.8164,10.8575
+Ridge per sensor,ridge,6,4.0820,7.1894,11.6992
+Ridge per sensor,ridge,7,4.3007,7.5151,12.4769
+Ridge per sensor,ridge,8,4.5023,7.8013,13.1926
+Ridge per sensor,ridge,9,4.6880,8.0529,13.8472
+Ridge per sensor,ridge,10,4.8608,8.2790,14.4508
+Ridge per sensor,ridge,11,5.0202,8.4820,15.0116
+Ridge per sensor,ridge,12,5.1720,8.6677,15.5464
+Multi-output Random Forest,rf,1,2.4250,4.1124,6.0142
+Multi-output Random Forest,rf,2,2.8010,5.0257,7.3114
+Multi-output Random Forest,rf,3,3.0782,5.6150,8.3167
+Multi-output Random Forest,rf,4,3.3075,6.0584,9.1770
+Multi-output Random Forest,rf,5,3.5049,6.4112,9.9197
+Multi-output Random Forest,rf,6,3.6787,6.7107,10.5846
+Multi-output Random Forest,rf,7,3.8363,6.9617,11.1704
+Multi-output Random Forest,rf,8,3.9769,7.1782,11.6796
+Multi-output Random Forest,rf,9,4.1036,7.3676,12.1618
+Multi-output Random Forest,rf,10,4.2234,7.5403,12.6205
+Multi-output Random Forest,rf,11,4.3356,7.6994,13.0628
+Multi-output Random Forest,rf,12,4.4452,7.8526,13.4975
+LSTM (no graph),lstm,1,2.3753,4.1866,5.8681
+LSTM (no graph),lstm,2,2.7181,5.1739,7.0582
+LSTM (no graph),lstm,3,2.9725,5.8382,7.9919
+LSTM (no graph),lstm,4,3.1869,6.3611,8.8195
+LSTM (no graph),lstm,5,3.3776,6.8045,9.5919
+LSTM (no graph),lstm,6,3.5524,7.1949,10.3060
+LSTM (no graph),lstm,7,3.7087,7.5460,10.9407
+LSTM (no graph),lstm,8,3.8539,7.8599,11.5232
+LSTM (no graph),lstm,9,3.9863,8.1356,12.0424
+LSTM (no graph),lstm,10,4.1148,8.3947,12.5702
+LSTM (no graph),lstm,11,4.2365,8.6262,13.0850
+LSTM (no graph),lstm,12,4.3514,8.8391,13.5365
+XGBoost per horizon,xgb,1,2.3847,4.0401,5.8921
+XGBoost per horizon,xgb,2,2.7532,4.9221,7.2019
+XGBoost per horizon,xgb,3,3.0155,5.4692,8.1759
+XGBoost per horizon,xgb,4,3.2097,5.8580,8.9266
+XGBoost per horizon,xgb,5,3.3760,6.1659,9.5678
+XGBoost per horizon,xgb,6,3.5096,6.4112,10.0909
+XGBoost per horizon,xgb,7,3.6296,6.6283,10.5558
+XGBoost per horizon,xgb,8,3.7296,6.8048,10.9433
+XGBoost per horizon,xgb,9,3.8142,6.9524,11.2694
+XGBoost per horizon,xgb,10,3.8846,7.0766,11.5350
+XGBoost per horizon,xgb,11,3.9520,7.1879,11.7910
+XGBoost per horizon,xgb,12,4.0064,7.2746,11.9968
+XGBoost + neighbours,xgb_both,1,,,
+XGBoost + neighbours,xgb_both,2,,,
+XGBoost + neighbours,xgb_both,3,2.9075,5.1723,7.6832
+XGBoost + neighbours,xgb_both,4,,,
+XGBoost + neighbours,xgb_both,5,,,
+XGBoost + neighbours,xgb_both,6,3.4181,6.1719,9.6138
+XGBoost + neighbours,xgb_both,7,,,
+XGBoost + neighbours,xgb_both,8,,,
+XGBoost + neighbours,xgb_both,9,,,
+XGBoost + neighbours,xgb_both,10,,,
+XGBoost + neighbours,xgb_both,11,,,
+XGBoost + neighbours,xgb_both,12,3.9494,7.1365,11.6796
+STGAT (ours),stgat_s0,1,2.2939,3.9538,5.5067
+STGAT (ours),stgat_s0,2,2.6096,4.8370,6.5896
+STGAT (ours),stgat_s0,3,2.8385,5.4319,7.4536
+STGAT (ours),stgat_s0,4,3.0225,5.8999,8.1761
+STGAT (ours),stgat_s0,5,3.1778,6.2820,8.7935
+STGAT (ours),stgat_s0,6,3.3200,6.6122,9.3642
+STGAT (ours),stgat_s0,7,3.4473,6.9027,9.8963
+STGAT (ours),stgat_s0,8,3.5635,7.1619,10.3899
+STGAT (ours),stgat_s0,9,3.6678,7.3886,10.8299
+STGAT (ours),stgat_s0,10,3.7643,7.5939,11.2207
+STGAT (ours),stgat_s0,11,3.8594,7.7859,11.5854
+STGAT (ours),stgat_s0,12,3.9545,7.9709,11.9476
+STGAT (ours),stgat_s1,1,2.3014,3.9773,5.5314
+STGAT (ours),stgat_s1,2,2.6128,4.8446,6.5957
+STGAT (ours),stgat_s1,3,2.8378,5.4424,7.4486
+STGAT (ours),stgat_s1,4,3.0212,5.9044,8.1654
+STGAT (ours),stgat_s1,5,3.1774,6.2791,8.7949
+STGAT (ours),stgat_s1,6,3.3198,6.6065,9.3772
+STGAT (ours),stgat_s1,7,3.4447,6.8923,9.8946
+STGAT (ours),stgat_s1,8,3.5590,7.1474,10.3808
+STGAT (ours),stgat_s1,9,3.6646,7.3740,10.8185
+STGAT (ours),stgat_s1,10,3.7632,7.5833,11.2111
+STGAT (ours),stgat_s1,11,3.8592,7.7780,11.5827
+STGAT (ours),stgat_s1,12,3.9541,7.9642,11.9343
+STGAT (ours),stgat_s2,1,2.2952,3.9637,5.5154
+STGAT (ours),stgat_s2,2,2.6130,4.8375,6.6101
+STGAT (ours),stgat_s2,3,2.8406,5.4298,7.4732
+STGAT (ours),stgat_s2,4,3.0243,5.9003,8.1950
+STGAT (ours),stgat_s2,5,3.1810,6.2849,8.8309
+STGAT (ours),stgat_s2,6,3.3211,6.6065,9.3867
+STGAT (ours),stgat_s2,7,3.4480,6.8886,9.9092
+STGAT (ours),stgat_s2,8,3.5625,7.1456,10.4044
+STGAT (ours),stgat_s2,9,3.6644,7.3729,10.8342
+STGAT (ours),stgat_s2,10,3.7617,7.5800,11.2287
+STGAT (ours),stgat_s2,11,3.8572,7.7715,11.6000
+STGAT (ours),stgat_s2,12,3.9513,7.9545,11.9529
+DCRNN,dcrnn_s0,1,2.1466,3.7123,5.1035
+DCRNN,dcrnn_s0,2,2.4425,4.5599,6.0606
+DCRNN,dcrnn_s0,3,2.6417,5.1564,6.7796
+DCRNN,dcrnn_s0,4,2.8005,5.6286,7.3821
+DCRNN,dcrnn_s0,5,2.9320,6.0080,7.9038
+DCRNN,dcrnn_s0,6,3.0495,6.3347,8.3618
+DCRNN,dcrnn_s0,7,3.1526,6.6199,8.7654
+DCRNN,dcrnn_s0,8,3.2477,6.8726,9.1334
+DCRNN,dcrnn_s0,9,3.3350,7.1003,9.4657
+DCRNN,dcrnn_s0,10,3.4155,7.3051,9.7621
+DCRNN,dcrnn_s0,11,3.4919,7.4931,10.0381
+DCRNN,dcrnn_s0,12,3.5681,7.6752,10.3099
+DCRNN,dcrnn_s1,1,2.1531,3.7321,5.1500
+DCRNN,dcrnn_s1,2,2.4454,4.5777,6.1095
+DCRNN,dcrnn_s1,3,2.6447,5.1742,6.8489
+DCRNN,dcrnn_s1,4,2.8021,5.6426,7.4601
+DCRNN,dcrnn_s1,5,2.9355,6.0284,7.9983
+DCRNN,dcrnn_s1,6,3.0515,6.3556,8.4688
+DCRNN,dcrnn_s1,7,3.1587,6.6460,8.9004
+DCRNN,dcrnn_s1,8,3.2553,6.9007,9.2866
+DCRNN,dcrnn_s1,9,3.3440,7.1315,9.6443
+DCRNN,dcrnn_s1,10,3.4239,7.3341,9.9652
+DCRNN,dcrnn_s1,11,3.4995,7.5156,10.2630
+DCRNN,dcrnn_s1,12,3.5752,7.6957,10.5615
+DCRNN,dcrnn_s2,1,2.1528,3.7297,5.1330
+DCRNN,dcrnn_s2,2,2.4486,4.5881,6.0928
+DCRNN,dcrnn_s2,3,2.6453,5.1820,6.8044
+DCRNN,dcrnn_s2,4,2.8017,5.6443,7.3950
+DCRNN,dcrnn_s2,5,2.9325,6.0222,7.9090
+DCRNN,dcrnn_s2,6,3.0464,6.3405,8.3499
+DCRNN,dcrnn_s2,7,3.1494,6.6173,8.7434
+DCRNN,dcrnn_s2,8,3.2421,6.8629,9.1018
+DCRNN,dcrnn_s2,9,3.3280,7.0792,9.4196
+DCRNN,dcrnn_s2,10,3.4052,7.2745,9.7028
+DCRNN,dcrnn_s2,11,3.4821,7.4553,9.9735
+DCRNN,dcrnn_s2,12,3.5559,7.6258,10.2213
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,1,2.1315,3.6985,5.0499
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,2,2.4237,4.5270,6.0108
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,3,2.6183,5.0915,6.7313
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,4,2.7717,5.5361,7.3353
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,5,2.8986,5.8888,7.8635
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,6,3.0104,6.1911,8.3241
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,7,3.1081,6.4520,8.7388
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,8,3.1961,6.6786,9.0948
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,9,3.2731,6.8667,9.4318
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,10,3.3433,7.0286,9.7316
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,11,3.4088,7.1733,10.0234
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s0,12,3.4708,7.3068,10.2865
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,1,2.1372,3.7115,5.0658
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,2,2.4278,4.5428,6.0276
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,3,2.6244,5.1142,6.7657
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,4,2.7767,5.5542,7.3692
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,5,2.9056,5.9150,7.9172
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,6,3.0161,6.2125,8.3844
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,7,3.1167,6.4794,8.8180
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,8,3.2062,6.7072,9.1979
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,9,3.2864,6.9118,9.5475
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,10,3.3580,7.0752,9.8653
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,11,3.4233,7.2220,10.1632
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s1,12,3.4836,7.3431,10.4219
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,1,2.1397,3.7182,5.0941
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,2,2.4341,4.5579,6.0640
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,3,2.6276,5.1251,6.7834
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,4,2.7794,5.5560,7.3797
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,5,2.9055,5.9035,7.9041
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,6,3.0136,6.1962,8.3573
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,7,3.1103,6.4508,8.7655
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,8,3.1950,6.6619,9.1347
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,9,3.2714,6.8407,9.4601
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,10,3.3391,6.9947,9.7499
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,11,3.4054,7.1398,10.0319
+Hybrid: DCRNN + XGBoost (ours),hybrid_resid_s2,12,3.4648,7.2544,10.2823

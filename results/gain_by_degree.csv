@@ -1,0 +1,41 @@
+model,degree,sensors,mae_60min
+Persistence,0-4,15,4.2841
+Persistence,5-8,28,4.9187
+Persistence,9-12,39,5.5854
+Persistence,13+,125,5.5553
+Historical average,0-4,15,3.1789
+Historical average,5-8,28,4.0686
+Historical average,9-12,39,4.5797
+Historical average,13+,125,4.6315
+Ridge per sensor,0-4,15,3.7587
+Ridge per sensor,5-8,28,4.5503
+Ridge per sensor,9-12,39,5.2793
+Ridge per sensor,13+,125,5.4713
+Multi-output Random Forest,0-4,15,3.5192
+Multi-output Random Forest,5-8,28,4.0397
+Multi-output Random Forest,9-12,39,4.5878
+Multi-output Random Forest,13+,125,4.6265
+LSTM (no graph),0-4,15,3.4599
+LSTM (no graph),5-8,28,4.0217
+LSTM (no graph),9-12,39,4.4264
+LSTM (no graph),13+,125,4.5385
+XGBoost per horizon,0-4,15,3.1281
+XGBoost per horizon,5-8,28,3.6956
+XGBoost per horizon,9-12,39,4.1785
+XGBoost per horizon,13+,125,4.1494
+XGBoost + neighbours,0-4,15,3.1280
+XGBoost + neighbours,5-8,28,3.6717
+XGBoost + neighbours,9-12,39,4.1156
+XGBoost + neighbours,13+,125,4.0801
+STGAT (ours),0-4,15,3.3611
+STGAT (ours),5-8,28,3.7030
+STGAT (ours),9-12,39,4.1266
+STGAT (ours),13+,125,4.0530
+DCRNN,0-4,15,2.9950
+DCRNN,5-8,28,3.3873
+DCRNN,9-12,39,3.8212
+DCRNN,13+,125,3.6198
+Hybrid: DCRNN + XGBoost (ours),0-4,15,2.9037
+Hybrid: DCRNN + XGBoost (ours),5-8,28,3.3039
+Hybrid: DCRNN + XGBoost (ours),9-12,39,3.6910
+Hybrid: DCRNN + XGBoost (ours),13+,125,3.5336

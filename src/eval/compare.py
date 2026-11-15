@@ -41,8 +41,16 @@ MODELS = {
     "XGBoost + neighbours": ["xgb_both"],
     "STGAT (ours)": [f"stgat_s{s}" for s in SEEDS],
     "DCRNN": [f"dcrnn_s{s}" for s in SEEDS],
+    "Hybrid: DCRNN + XGBoost (ours)": [f"hybrid_resid_s{s}" for s in SEEDS],
 }
 GRAPH_MODELS = ("STGAT (ours)", "DCRNN")
+HYBRID = "Hybrid: DCRNN + XGBoost (ours)"
+HYBRID_VARIANTS = {  # ablation of the hybrid itself: each row is mean over the DCRNN seeds it was built on
+    "DCRNN alone": "dcrnn_s{s}",
+    "Blend: w_h * DCRNN + (1 - w_h) * XGBoost": "hybrid_blend_s{s}",
+    "Residual corrector, all 46 features (deep trees)": "hybrid_residfull_s{s}",
+    "Residual corrector, compact + regularised (main)": "hybrid_resid_s{s}",
+}
 BEST_INDEPENDENT = "XGBoost per horizon"                 # strongest model that never sees a neighbour (Phase 3)
 
 
@@ -116,27 +124,57 @@ def dm_test(diff: np.ndarray, lag: int = 1) -> tuple[float, float]:
     return float(stat), float(2 * stats.t.sf(abs(stat), df=t - 1))
 
 
+def compare_pair(P, B, Y, M, days, rng, n_boot: int) -> list[dict]:
+    """Paired day-level tests of forecast P against baseline B at the headline horizons."""
+    rows = []
+    for h in HORIZONS:
+        eb, n = daily_errors(B, Y, M, days, h)
+        eg, _ = daily_errors(P, Y, M, days, h)
+        gain = (eb.sum() - eg.sum()) / n.sum()                           # mph, > 0 = model better than baseline
+        idx = rng.integers(0, len(n), (n_boot, len(n)))
+        boot = (eb[idx].sum(1) - eg[idx].sum(1)) / n[idx].sum(1)
+        p_boot = float(min(1.0, 2 * min((boot <= 0).mean(), (boot >= 0).mean())))
+        stat, p_dm = dm_test(eb / n - eg / n)
+        rows.append({"minutes": 5 * h, "baseline_mae": eb.sum() / n.sum(), "model_mae": eg.sum() / n.sum(),
+                     "gain_mph": gain, "gain_pct": 100 * gain / (eb.sum() / n.sum()),
+                     "ci95_low": float(np.percentile(boot, 2.5)), "ci95_high": float(np.percentile(boot, 97.5)),
+                     "p_bootstrap": p_boot, "dm_stat": stat, "p_dm": p_dm, "test_days": int(len(n)),
+                     "days_model_better": int((eg / n < eb / n).sum())})
+    return rows
+
+
 def significance(Y, M, days, models, n_boot: int = 10_000, seed: int = 0) -> pd.DataFrame:
+    """Every graph model / hybrid seed against XGBoost, and the hybrid against the DCRNN seed it was built on."""
     rng = np.random.default_rng(seed)
     base = load_pred(models[BEST_INDEPENDENT][0])
+    pairs = []
+    for label in [g for g in (*GRAPH_MODELS, HYBRID, "XGBoost + neighbours") if g in models]:
+        pairs += [(label, f, base, BEST_INDEPENDENT) for f in models[label]]
+    if HYBRID in models:
+        for f in models[HYBRID]:
+            dl = f.replace("hybrid_resid", "dcrnn")
+            if (PRED_DIR / f"{dl}_test.npy").exists():
+                pairs.append((HYBRID, f, load_pred(dl), "DCRNN (same seed)"))
     rows = []
-    for label in [g for g in GRAPH_MODELS if g in models] + ["XGBoost + neighbours"] * ("XGBoost + neighbours" in models):
-        for f in models[label]:
-            P = load_pred(f)
-            for h in HORIZONS:
-                eb, n = daily_errors(base, Y, M, days, h)
-                eg, _ = daily_errors(P, Y, M, days, h)
-                gain = (eb.sum() - eg.sum()) / n.sum()                       # mph, > 0 = graph model better
-                idx = rng.integers(0, len(n), (n_boot, len(n)))
-                boot = (eb[idx].sum(1) - eg[idx].sum(1)) / n[idx].sum(1)
-                p_boot = float(min(1.0, 2 * min((boot <= 0).mean(), (boot >= 0).mean())))
-                stat, p_dm = dm_test(eb / n - eg / n)
-                rows.append({"model": label, "run": f, "minutes": 5 * h, "baseline": BEST_INDEPENDENT,
-                             "baseline_mae": eb.sum() / n.sum(), "model_mae": eg.sum() / n.sum(), "gain_mph": gain,
-                             "gain_pct": 100 * gain / (eb.sum() / n.sum()),
-                             "ci95_low": float(np.percentile(boot, 2.5)), "ci95_high": float(np.percentile(boot, 97.5)),
-                             "p_bootstrap": p_boot, "dm_stat": stat, "p_dm": p_dm, "test_days": int(len(n)),
-                             "days_model_better": int((eg / n < eb / n).sum())})
+    for label, f, B, bname in pairs:
+        for r in compare_pair(load_pred(f), B, Y, M, days, rng, n_boot):
+            rows.append({"model": label, "run": f, "baseline": bname, **r})
+    return pd.DataFrame(rows)
+
+
+def hybrid_ablation(Y, M) -> pd.DataFrame:
+    """results/hybrid_ablation.csv: test MAE of the hybrid's variants (mean and std over DCRNN seeds)."""
+    rows = []
+    for label, pattern in HYBRID_VARIANTS.items():
+        runs = [pattern.format(s=s) for s in SEEDS if (PRED_DIR / f"{pattern.format(s=s)}_test.npy").exists()]
+        if not runs:
+            continue
+        vals = pd.DataFrame([evaluate_rows(Y, load_pred(f), M).set_index("horizon").mae for f in runs])
+        r = {"variant": label, "runs": len(runs)}
+        for h, mins in REPORT_HORIZONS.items():
+            r[f"MAE_{mins}min"] = round(float(vals[str(h)].mean()), 3)
+            r[f"MAE_{mins}min_std"] = round(float(vals[str(h)].std()), 3) if len(runs) > 1 else 0.0
+        rows.append(r)
     return pd.DataFrame(rows)
 
 
@@ -190,6 +228,10 @@ def main() -> None:
     print(final[cols].to_string(index=False))
 
     sig = significance(Y, M, days, models)
+    hyb = hybrid_ablation(Y, M)
+    hyb.to_csv(OUT / "hybrid_ablation.csv", index=False)
+    if len(hyb):
+        print(hyb.to_string(index=False))
     sig.to_csv(OUT / "significance.csv", index=False, float_format="%.5g")
     deg = gain_by_degree(Y, M, models, load_adjacency()["adj"])
     deg.to_csv(OUT / "gain_by_degree.csv", index=False, float_format="%.4f")
@@ -205,9 +247,16 @@ def main() -> None:
         for mins in (15, 30, 60):
             b, g = fb.loc[BEST_INDEPENDENT, f"MAE_{mins}min"], fb.loc[best_graph, f"MAE_{mins}min"]
             findings[f"gain_{mins}min_pct"] = round(100 * (b - g) / b, 2)
-        s = sig[sig.model == best_graph]
+        s = sig[(sig.model == best_graph) & (sig.baseline == BEST_INDEPENDENT)]
         findings["max_p_bootstrap"] = {int(m): float(s[s.minutes == m].p_bootstrap.max()) for m in (15, 30, 60)}
         findings["max_p_dm"] = {int(m): float(s[s.minutes == m].p_dm.max()) for m in (15, 30, 60)}
+    if HYBRID in models:
+        fh = final.set_index("model").loc[HYBRID]
+        hs = sig[(sig.model == HYBRID) & (sig.baseline == "DCRNN (same seed)")]
+        findings["hybrid"] = {f"MAE_{m}min": float(fh[f"MAE_{m}min"]) for m in (15, 30, 60)}
+        findings["hybrid_vs_dcrnn"] = {int(m): {"gain_pct": float(g.gain_pct.mean()), "max_p_bootstrap": float(g.p_bootstrap.max()),
+                                                "max_p_dm": float(g.p_dm.max()), "min_days_better": int(g.days_model_better.min())}
+                                       for m, g in hs.groupby("minutes")}
     (OUT / "phase6_findings.json").write_text(json.dumps(findings, indent=2, default=float))
     print(json.dumps(findings, indent=2, default=float))
 
