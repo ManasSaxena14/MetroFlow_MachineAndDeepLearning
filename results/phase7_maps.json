@@ -1,0 +1,45 @@
+{
+  "side_by_side": {
+    "window": 1287,
+    "target_time": "2012-06-08 16:30:00",
+    "horizon_min": 30,
+    "actual_congested": 103,
+    "XGBoost": {
+      "congested_predicted": 76,
+      "congested_caught": 75,
+      "level_accuracy_pct": 81.2
+    },
+    "DCRNN": {
+      "congested_predicted": 93,
+      "congested_caught": 88,
+      "level_accuracy_pct": 86.1
+    }
+  },
+  "error_map": {
+    "sensors_graph_better": 198,
+    "sensors": 207,
+    "median_gain_mph": 0.31921364966385823
+  },
+  "time_space": {
+    "day": "2012-06-13",
+    "sensors": [
+      1,
+      177,
+      28,
+      7,
+      107,
+      201,
+      110,
+      167,
+      53,
+      62,
+      58,
+      13,
+      143,
+      116,
+      199
+    ],
+    "km": 15.561800000000002
+  },
+  "animation": "/Users/harshraj/Downloads/TrafficFlowControl_repo/docs/figures/fig21_congestion_animation.html"
+}
