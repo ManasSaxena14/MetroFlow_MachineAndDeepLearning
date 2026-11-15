@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: setup data eda preprocess features baselines gap accuracy report dashboard test lint all
+.PHONY: setup data eda preprocess features baselines gap accuracy graph phase5 compare maps slides report dashboard test lint all
 
 setup:            ## create the environment (Python 3.11 via uv) and install pinned requirements
 	uv venv --python 3.11 .venv && uv pip install --python $(PY) -r requirements-pipeline.txt
@@ -29,6 +29,21 @@ gap:              ## gap experiments -> results/gap_results.csv, results/gap/ an
 accuracy:         ## percent accuracy and within-5-mph scores -> results/accuracy.csv
 	$(PY) -m src.eval.accuracy
 
+graph:            ## Phase 5: train STGAT and DCRNN (3 seeds), the ablations and the reference-protocol DCRNN (~10 h on an M3 Pro)
+	./scripts/run_phase5.sh all
+
+phase5:           ## Phase 5 analysis: ablation table, learning curves, attention inspection -> results/, figures 12-14
+	$(PY) -m src.eval.phase5
+
+compare:          ## Phase 6: final fair comparison, significance tests, gain breakdown -> results/final*.csv, figures 15-17
+	$(PY) -m src.eval.compare
+
+maps:             ## Phase 7: congestion maps, error map, time-space diagram, animated HTML -> figures 18-21
+	$(PY) -m src.viz.maps
+
+slides:           ## regenerate the DL-part slide deck from results/ (docs/presentation/DL_Graph_Models.pptx)
+	$(PY) scripts/make_dl_slides.py
+
 report:           ## regenerate the report tables from results/ and compile docs/report/report.pdf
 	$(PY) scripts/make_report_tables.py
 	cd docs/report && tectonic report.tex
@@ -42,4 +57,4 @@ test:             ## run the automated tests
 lint:             ## static checks
 	.venv/bin/ruff check src tests scripts app.py
 
-all: data eda preprocess features baselines gap accuracy report test lint
+all: data eda preprocess features baselines gap accuracy graph phase5 compare maps slides report test lint
