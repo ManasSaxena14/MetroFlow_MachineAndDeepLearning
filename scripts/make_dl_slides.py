@@ -28,6 +28,7 @@ FIG = ROOT / "docs" / "figures"
 TEMPLATE = ROOT / "docs" / "presentation" / "AML_Traffic_Flow_Forecasting.pptx"
 OUT = ROOT / "docs" / "presentation" / "DL_Graph_Models.pptx"
 FOOTER = "DL phase  |  Graph models for traffic forecasting on METR-LA"
+HYBRID = "Hybrid: DCRNN + XGBoost (ours)"
 
 T = MSO_THEME_COLOR
 INK, WHITE, TINT, GREY = T.TEXT_1, T.BACKGROUND_1, T.BACKGROUND_2, T.ACCENT_6
@@ -48,6 +49,8 @@ def load() -> dict:
          "graph": pd.read_csv(RES / "graph_models.csv")}
     ab = RES / "ablations.csv"
     d["abl"] = pd.read_csv(ab) if ab.exists() else pd.DataFrame()
+    hy = RES / "hybrid_ablation.csv"
+    d["hyb"] = pd.read_csv(hy) if hy.exists() else pd.DataFrame()
     sh = RES / "attention_shares.csv"
     d["att"] = pd.read_csv(sh) if sh.exists() else pd.DataFrame()
     return d
@@ -363,19 +366,19 @@ def headline_chart(prs, d):
     f, long = d["final"], d["long"]
     best = d["p6"]["best_graph_model"]
     b, xg = f.loc[best], f.loc["XGBoost per horizon"]
-    s = content(prs, f"{best.replace(' (ours)', '')} is best at every horizon", "Test MAE (mph) by forecast horizon, lower is better",
+    s = content(prs, "Graph models win at every horizon", "Test MAE (mph) by forecast horizon, lower is better",
                 "One line per model, all 12 horizons, test block. Graph models are the mean of 3 seeds. The gap to the "
                 "per-sensor models appears at the first horizon and stays: the graph models see a slowdown building at "
                 "a neighbour before it reaches the sensor.")
     cd = CategoryChartData()
     cd.categories = [str(5 * h) for h in range(1, 13)]
-    names = [m for m in ("LSTM (no graph)", "XGBoost per horizon", "STGAT (ours)", "DCRNN") if m in set(long.model)]
+    names = [m for m in ("LSTM (no graph)", "XGBoost per horizon", "STGAT (ours)", "DCRNN", HYBRID) if m in set(long.model)]
     for m in names:
         g = long[long.model == m].groupby("horizon").mae.mean().sort_index()
         cd.add_series(m, [round(v, 3) for v in g.values])
     ch = s.shapes.add_chart(XL_CHART_TYPE.LINE_MARKERS, Inches(0.4), Inches(1.4), Inches(6.2), Inches(3.55), cd).chart
     style_chart(ch)
-    colors = {"LSTM (no graph)": YELLOW, "XGBoost per horizon": BLUE, "STGAT (ours)": ORANGE, "DCRNN": AQUA}
+    colors = {"LSTM (no graph)": YELLOW, "XGBoost per horizon": BLUE, "STGAT (ours)": ORANGE, "DCRNN": AQUA, HYBRID: RED}
     for ser, m in zip(ch.series, names):
         ser.format.line.color.theme_color = colors[m]
         ser.format.line.width = Pt(2.25)
@@ -395,7 +398,11 @@ def headline_chart(prs, d):
          f"vs XGBoost at 60 min ({f2(b.MAE_60min)} vs {f2(xg.MAE_60min)}); -{pct(xg.MAE_15min, b.MAE_15min):.0f}% at 15 min",
          name="Gain")
     ref = d["p5"].get("reference_check")
-    if ref:
+    if HYBRID in f.index:
+        hb = f.loc[HYBRID]
+        stat(s, 6.8, 3.89, 2.7, 1.1, f"-{pct(b.MAE_60min, hb.MAE_60min):.1f}%",
+             f"extra gain of the hybrid over {best} at 60 min ({f2(hb.MAE_60min)} mph)", name="Hybrid")
+    elif ref:
         worst = max(abs(v["diff_pct"]) for v in ref.values())
         stat(s, 6.8, 3.89, 2.7, 1.1, f"within {worst:.0f}%", "of the published DCRNN numbers on the reference split",
              name="Reference")
@@ -411,29 +418,31 @@ def results_table(prs, d):
                 "graph models' larger RMSE gain matters. Peak = weekdays 07:00 to 09:59 and 16:00 to 19:59, judged on "
                 "the predicted timestamp.")
     order = ["Persistence", "Historical average", "Ridge per sensor", "Multi-output Random Forest", "LSTM (no graph)",
-             "XGBoost per horizon", "XGBoost + neighbours", "STGAT (ours)", "DCRNN"]
+             "XGBoost per horizon", "XGBoost + neighbours", "STGAT (ours)", "DCRNN", HYBRID]
     rows = [["Model", "MAE 15", "MAE 30", "MAE 60", "RMSE 60", "MAPE 60 %", "Peak MAE 60"]]
     for m in order:
         if m not in f.index:
             continue
         r = f.loc[m]
-        rows.append([m, f2(r.MAE_15min), f2(r.MAE_30min), f2(r.MAE_60min), f2(r.RMSE_60min), f"{r.MAPE_60min:.1f}",
+        rows.append([m.replace(HYBRID, "Hybrid (ours)"), f2(r.MAE_15min), f2(r.MAE_30min), f2(r.MAE_60min),
+                     f2(r.RMSE_60min), f"{r.MAPE_60min:.1f}",
                      f2(r.peak_MAE_60min)])
-    table(s, 0.5, 1.45, 9.0, rows, [2.7, 1.0, 1.0, 1.0, 1.05, 1.1, 1.15], best_cols=(1, 2, 3, 4, 5, 6), size=12, row_h=0.31)
+    table(s, 0.5, 1.4, 9.0, rows, [2.7, 1.0, 1.0, 1.0, 1.05, 1.1, 1.15], best_cols=(1, 2, 3, 4, 5, 6), size=12, row_h=0.29)
     text(s, 0.5, 4.65, 9.0, 0.3, "MAE and RMSE in mph; minutes = forecast horizon. Full tables: results/final.csv, "
          "results/final_by_horizon.csv.", size=11, color=GREY)
 
 
 def significance(prs, d):
     sig = d["sig"]
-    s = content(prs, "Is the gain real?", "Paired tests against XGBoost over the 24 test days (days, not points, are the unit)",
+    s = content(prs, "Is the gain real?", "Paired tests over the 24 test days (days, not points, are the unit)",
                 "Errors within a day are strongly correlated, so treating 1.2 million predictions as independent would "
                 "make any difference look significant. We aggregate errors per day, then run a paired bootstrap over "
                 "days (10,000 resamples) and a Diebold-Mariano test with the small-sample correction. Every seed is "
                 "tested; we report the worst one.")
-    rows = [["Model vs XGBoost", "Minutes", "Gain %", "95% CI (mph)", "Days better", "p (bootstrap)", "p (DM)"]]
-    for m in ("DCRNN", "STGAT (ours)", "XGBoost + neighbours"):
-        sm = sig[sig.model == m]
+    rows = [["Comparison", "Minutes", "Gain %", "95% CI (mph)", "Days better", "p (bootstrap)", "p (DM)"]]
+    for m, base, lab in (("DCRNN", "XGBoost per horizon", "DCRNN vs XGB"), ("STGAT (ours)", "XGBoost per horizon", "STGAT vs XGB"),
+                         (HYBRID, "DCRNN (same seed)", "Hybrid vs DCRNN")):
+        sm = sig[(sig.model == m) & (sig.baseline == base)]
         for mins in (15, 30, 60):
             r = sm[sm.minutes == mins]
             if r.empty:
@@ -442,10 +451,10 @@ def significance(prs, d):
             pb = "< 0.0001" if r.p_bootstrap.max() == 0 else f"{r.p_bootstrap.max():.3f}"
             pdm = "< 0.0001" if r.p_dm.max() < 1e-4 else f"{r.p_dm.max():.3f}"
             days = f"{int(r.days_model_better.min())} / {int(worst.test_days)}"
-            rows.append([m if mins == 15 else "", str(mins), f"{r.gain_pct.mean():.1f}",
+            rows.append([lab if mins == 15 else "", str(mins), f"{r.gain_pct.mean():.1f}",
                          f"{worst.ci95_low:.2f} to {worst.ci95_high:.2f}", days, pb, pdm])
     table(s, 0.5, 1.45, 9.0, rows, [2.2, 0.85, 0.85, 1.45, 1.15, 1.25, 1.25], size=12, row_h=0.285)
-    text(s, 0.5, 4.65, 9.0, 0.3, "Gain = reduction in MAE vs XGBoost (mean over seeds). Days better and p-values: worst seed.",
+    text(s, 0.5, 4.65, 9.0, 0.3, "Gain = reduction in MAE vs the baseline (mean over seeds). Days better and p-values: worst seed.",
          size=11, color=GREY)
 
 
@@ -487,13 +496,50 @@ def ablations(prs, d):
     if "stgat_random_s0" in abl.index:
         dl = abl.loc["stgat_random_s0"].MAE_60min - abl.loc["stgat_s0"].MAE_60min
         msgs.append(("Random graph", f"{dl:+.2f} mph: the real road links matter, not just extra inputs"))
-    if "dcrnn_k1_s0" in abl.index:
+    if "dcrnn_forward_s0" in abl.index:
+        dl = abl.loc["dcrnn_forward_s0"].MAE_60min - abl.loc["dcrnn_s0"].MAE_60min
+        msgs.append(("DCRNN, forward walk only", f"{dl:+.2f} mph: listening downstream matters for DCRNN too"))
+    elif "dcrnn_k1_s0" in abl.index:
         dl = abl.loc["dcrnn_k1_s0"].MAE_60min - abl.loc["dcrnn_s0"].MAE_60min
         msgs.append(("DCRNN, 1 hop", f"{dl:+.2f} mph vs 2 hops"))
     for i, (h, b) in enumerate(msgs[:3]):
         y = 1.45 + i * 1.18
         card(s, 6.95, y, 2.55, 1.05, name=f"Ablation note {i}")
         text(s, 7.1, y + 0.08, 2.3, 0.95, [(h, {"bold": True, "size": 14}), (b, {"size": 12, "space": 2})])
+
+
+def hybrid_slide(prs, d):
+    hyb, f, sig = d["hyb"], d["final"], d["sig"]
+    s = content(prs, "Hybrid: graph model + tree corrector",
+                "DCRNN is the backbone; a small XGBoost learns where it is systematically wrong",
+                "Why a hybrid: DCRNN is best overall, but after a congestion onset at 60 minutes ahead XGBoost's calendar "
+                "knowledge is slightly better, and the two make different errors. Following stacked generalisation, a "
+                "shallow XGBoost model learns DCRNN's residual from a few interpretable inputs. It must see forecasts "
+                "DCRNN was not trained on, so it is fitted on the validation block and scored once on test. A version "
+                "with all 46 features overfits; the compact, regularised one generalises.")
+    flow = [("DCRNN forecast", "graph, every recurrent step", AQUA), ("+ XGBoost residual", "depth 3, >=200 per leaf", BLUE),
+            ("Hybrid forecast", "fitted on validation only", RED)]
+    for i, (t1, t2, c) in enumerate(flow):
+        x = 0.5 + i * 3.05
+        card(s, x, 1.45, 2.75, 0.95, name=f"Hybrid step {i}")
+        badge(s, x + 0.15, 1.71, i + 1, fill=c, d=0.42)
+        text(s, x + 0.7, 1.55, 1.95, 0.8, [(t1, {"bold": True, "size": 14}), (t2, {"size": 11, "space": 2})])
+        if i < 2:
+            shape(s, MSO_SHAPE.RIGHT_ARROW, x + 2.8, 1.8, 0.2, 0.25, GREY, name=f"Hybrid arrow {i}")
+    if len(hyb):
+        rows = [["Design (mean of DCRNN seeds)", "15 min", "30 min", "60 min"]]
+        for _, r in hyb.iterrows():
+            lab = (r.variant.replace("w_h * DCRNN + (1 - w_h) * XGBoost", "weighted average")
+                   .replace("Residual corrector, ", "Corrector, ").replace(" (deep trees)", ""))
+            rows.append([lab, f2(r.MAE_15min), f2(r.MAE_30min), f2(r.MAE_60min)])
+        table(s, 0.5, 2.65, 5.6, rows, [3.2, 0.8, 0.8, 0.8], best_cols=(1, 2, 3), size=12)
+    hs = sig[(sig.model == HYBRID) & (sig.baseline == "DCRNN (same seed)")]
+    if len(hs) and HYBRID in f.index:
+        g60 = hs[hs.minutes == 60]
+        stat(s, 6.35, 2.65, 3.15, 1.0, f"-{g60.gain_pct.mean():.1f}%", "vs DCRNN at 60 min, same seed", num_size=22,
+             name="Hybrid gain")
+        stat(s, 6.35, 3.75, 3.15, 1.0, f"{int(hs.days_model_better.min())} / {int(hs.test_days.max())} days",
+             "on which the hybrid beats DCRNN (worst horizon, worst seed)", num_size=20, name="Hybrid days")
 
 
 def attention(prs, d):
@@ -626,12 +672,14 @@ def conclusion(prs, d):
     pts = [f"{best} beats the best per-sensor model at every horizon: {f2(b.MAE_15min)} | {f2(b.MAE_30min)} | "
            f"{f2(b.MAE_60min)} mph vs {f2(xg.MAE_15min)} | {f2(xg.MAE_30min)} | {f2(xg.MAE_60min)}, better on every test day.",
            "The gain grows with connectivity and is largest right after congestion starts: it comes from the graph.",
-           ("Our STGAT also beats XGBoost and learned to look downstream when a jam is coming; putting the graph inside "
-            "every recurrent step (DCRNN) works better than one attention pass." if st is not None else "")]
+           ("STGAT also beats XGBoost and learned to look downstream; mixing the graph into every recurrent step "
+            "(DCRNN) works better." if st is not None else ""),
+           (f"A regularised tree corrector on top of DCRNN (the hybrid) cuts error further: {f2(f.loc[HYBRID].MAE_60min)} mph "
+            "at 60 min." if HYBRID in f.index else "")]
     for i, t in enumerate([p for p in pts if p]):
-        y = 1.55 + i * 1.08
+        y = 1.5 + i * 0.84
         badge(s, 0.5, y + 0.05, i + 1, fill=ORANGE)
-        text(s, 1.1, y, 3.9, 1.0, t, size=13, color=WHITE)
+        text(s, 1.1, y, 3.95, 0.82, t, size=12, color=WHITE)
     card(s, 5.3, 1.5, 4.2, 3.3, fill=T.TEXT_2, name="Limits panel")
     text(s, 5.5, 1.62, 3.8, 3.1, [
         ("Limits", {"bold": True, "size": 17, "head": True, "color": WHITE}),
@@ -645,7 +693,7 @@ def conclusion(prs, d):
 
 
 def references(prs, d):
-    s = content(prs, "References", "Full bibliography with DOIs and arXiv identifiers: docs/report/references.bib",
+    s = content(prs, "References", "Full bibliography with DOIs and arXiv identifiers: docs/paper/references.bib",
                 "The two papers the brief names are Velickovic et al. (graph attention) and Zheng et al. (CityFlow). "
                 "DCRNN supplies the data, the graph, the protocol and the model we reproduce.")
     refs = ["[1] Li, Yu, Shahabi, Liu. Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic "
@@ -658,7 +706,8 @@ def references(prs, d):
             "[6] Cho et al. Learning Phrase Representations using RNN Encoder-Decoder. EMNLP 2014 (GRU).",
             "[7] Bengio, Vinyals, Jaitly, Shazeer. Scheduled Sampling for Sequence Prediction with RNNs. NeurIPS 2015.",
             "[8] Diebold, Mariano. Comparing Predictive Accuracy. J. Business & Economic Statistics 13(3), 1995.",
-            "[9] Harvey, Leybourne, Newbold. Testing the Equality of Prediction Mean Squared Errors. IJF 13(2), 1997."]
+            "[9] Harvey, Leybourne, Newbold. Testing the Equality of Prediction Mean Squared Errors. IJF 13(2), 1997.",
+            "[10] Wolpert. Stacked Generalization. Neural Networks 5(2), 1992."]
     text(s, 0.5, 1.5, 9.0, 3.4, [(r, {"size": 12, "space": 5}) for r in refs])
 
 
@@ -674,7 +723,7 @@ def main() -> None:
             if sh.has_text_frame and "AML phase" in sh.text_frame.text:
                 sh.text_frame.paragraphs[0].runs[0].text = FOOTER
     for build in (title_slide, recap, models, direction, protocol, headline_chart, results_table, significance,
-                  ablations, attention, where, maps, time_space, conclusion, references):
+                  ablations, hybrid_slide, attention, where, maps, time_space, conclusion, references):
         build(prs, d)
     prs.core_properties.title = "Learning the road network: graph models for traffic forecasting (DL phase)"
     prs.core_properties.author = "Team T036"
