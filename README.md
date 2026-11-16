@@ -182,4 +182,13 @@ The full bibliography, with DOIs and arXiv identifiers, is in [docs/report/refer
 
 ## Contributors
 
-Manas Saxena (pipeline, baselines, gap analysis, report, slides), Harsh Raj (project setup, data loading and exploratory analysis; graph models, hybrid, fair comparison, congestion maps, research paper and DL slides), Sumit (Streamlit dashboard).
+Team T036, Newton School of Technology, Rishihood University. The work is divided equally: each member owns one part of
+the machine-learning phase and one part of the deep-learning phase.
+
+| Member | Phase 1: machine learning | Phase 2: deep learning |
+|---|---|---|
+| Harsh Raj (2401010180) | project setup, data loading, exploratory analysis and the congestion-propagation finding | STGAT graph attention model, graph layers and attention inspection |
+| Manas Saxena (2401010260) | leak-free preprocessing, the six baselines, AML report and slides | fair comparison and day-level significance tests |
+| Adil Mirza (2401020005) | feature engineering, XGBoost and Random Forest tuning | DCRNN model, ablation studies and the published-number reproduction |
+| Augustya Purohit (2401010114) | gap analysis: horizon, onset, residual and neighbour experiments | hybrid DCRNN + XGBoost model and the IEEE research paper |
+| Sumit Yadav (2401010464) | Streamlit dashboard and accuracy metrics | congestion maps, time-space diagram and the DL slides |
