@@ -1,0 +1,151 @@
+{
+  "config": {
+    "model": "dcrnn",
+    "protocol": "dcrnn",
+    "seed": 0,
+    "graph": "bidirectional",
+    "gat_layers": 2,
+    "dropout": 0.1,
+    "supports": "dual",
+    "k": 2,
+    "hidden": 64,
+    "batch": 64,
+    "lr": 0.01,
+    "epochs": 30,
+    "patience": 8,
+    "milestones": [
+      20,
+      30
+    ],
+    "epoch_frac": 0.5,
+    "grad_clip": 5.0,
+    "tag": ""
+  },
+  "name": "dcrnn_dcrnn_s0",
+  "parameters": 377153,
+  "best_val_mae": 2.799,
+  "epochs_run": 24,
+  "history": [
+    {
+      "epoch": 1,
+      "train_mae": 3.219,
+      "val_mae": 3.624
+    },
+    {
+      "epoch": 2,
+      "train_mae": 2.287,
+      "val_mae": 3.174
+    },
+    {
+      "epoch": 3,
+      "train_mae": 2.202,
+      "val_mae": 3.288
+    },
+    {
+      "epoch": 4,
+      "train_mae": 2.162,
+      "val_mae": 3.06
+    },
+    {
+      "epoch": 5,
+      "train_mae": 2.118,
+      "val_mae": 3.104
+    },
+    {
+      "epoch": 6,
+      "train_mae": 2.101,
+      "val_mae": 2.973
+    },
+    {
+      "epoch": 7,
+      "train_mae": 2.089,
+      "val_mae": 2.942
+    },
+    {
+      "epoch": 8,
+      "train_mae": 2.061,
+      "val_mae": 3.008
+    },
+    {
+      "epoch": 9,
+      "train_mae": 2.051,
+      "val_mae": 3.263
+    },
+    {
+      "epoch": 10,
+      "train_mae": 2.042,
+      "val_mae": 2.968
+    },
+    {
+      "epoch": 11,
+      "train_mae": 2.029,
+      "val_mae": 3.038
+    },
+    {
+      "epoch": 12,
+      "train_mae": 2.027,
+      "val_mae": 2.942
+    },
+    {
+      "epoch": 13,
+      "train_mae": 2.01,
+      "val_mae": 3.49
+    },
+    {
+      "epoch": 14,
+      "train_mae": 2.007,
+      "val_mae": 2.951
+    },
+    {
+      "epoch": 15,
+      "train_mae": 1.999,
+      "val_mae": 2.957
+    },
+    {
+      "epoch": 16,
+      "train_mae": 1.996,
+      "val_mae": 2.936
+    },
+    {
+      "epoch": 17,
+      "train_mae": 1.989,
+      "val_mae": 2.918
+    },
+    {
+      "epoch": 18,
+      "train_mae": 1.987,
+      "val_mae": 2.967
+    },
+    {
+      "epoch": 19,
+      "train_mae": 1.975,
+      "val_mae": 2.879
+    },
+    {
+      "epoch": 20,
+      "train_mae": 1.982,
+      "val_mae": 2.882
+    },
+    {
+      "epoch": 21,
+      "train_mae": 1.945,
+      "val_mae": 2.8
+    },
+    {
+      "epoch": 22,
+      "train_mae": 1.932,
+      "val_mae": 2.799
+    },
+    {
+      "epoch": 23,
+      "train_mae": 1.93,
+      "val_mae": 2.8
+    },
+    {
+      "epoch": 24,
+      "train_mae": 1.932,
+      "val_mae": 2.801
+    }
+  ],
+  "note": "run interrupted after epoch 24 of 30 (machine shutdown); scored from the best checkpoint (epoch 22), saved after the learning-rate drop at epoch 20"
+}

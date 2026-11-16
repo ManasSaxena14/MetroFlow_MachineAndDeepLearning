@@ -1,5 +1,21 @@
 {
-  "reference_check": null,
+  "reference_check": {
+    "15min": {
+      "ours": 2.631,
+      "published": 2.67,
+      "diff_pct": -1.5
+    },
+    "30min": {
+      "ours": 3.033,
+      "published": 3.08,
+      "diff_pct": -1.5
+    },
+    "60min": {
+      "ours": 3.537,
+      "published": 3.56,
+      "diff_pct": -0.6
+    }
+  },
   "attention_shares": [
     {
       "situation": "slowdown ahead (30 min)",

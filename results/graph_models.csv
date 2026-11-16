@@ -1,4 +1,6 @@
 run,model,protocol,seed,graph,gat_layers,supports,k,split,parameters,epochs_run,MAE_15min,RMSE_15min,MAPE_15min,MAE_30min,RMSE_30min,MAPE_30min,MAE_60min,RMSE_60min,MAPE_60min,MAE_avg,RMSE_avg,MAPE_avg
+dcrnn_dcrnn_s0,dcrnn,dcrnn,0,bidirectional,2,dual,2,val,377153,24,2.453,4.819,6.192,2.822,5.922,7.611,3.301,7.182,9.385,2.799,5.914,7.523
+dcrnn_dcrnn_s0,dcrnn,dcrnn,0,bidirectional,2,dual,2,test,377153,24,2.631,5.129,6.729,3.033,6.285,8.254,3.537,7.583,10.129,3.002,6.264,8.151
 dcrnn_forward_s0,dcrnn,strict,0,bidirectional,2,forward,2,val,226625,30,2.571,5.217,6.759,2.957,6.334,8.269,3.462,7.575,10.096,2.934,6.302,8.16
 dcrnn_forward_s0,dcrnn,strict,0,bidirectional,2,forward,2,test,226625,30,2.774,5.541,7.365,3.191,6.692,8.967,3.723,7.946,10.922,3.161,6.644,8.85
 dcrnn_k1_s0,dcrnn,strict,0,bidirectional,2,dual,1,val,226625,30,2.466,4.86,6.237,2.84,5.989,7.713,3.33,7.283,9.426,2.817,5.979,7.588

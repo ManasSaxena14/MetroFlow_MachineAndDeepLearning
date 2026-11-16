@@ -17,6 +17,7 @@ stgat_queue() {
     $PY stgat --graph $g --seed 0 $STGAT
   done
   $PY stgat --gat-layers 1 --seed 0 $STGAT                     # hops: 1 vs 2 attention layers
+  $PY stgat --dropout 0.0 --seed 0 $STGAT                      # regularisation: dropout off
 }
 
 dcrnn_queue() {
