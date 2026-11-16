@@ -20,8 +20,9 @@
 \title{Do Graph Neural Networks Close the Spatial Gap?\\
 Leak-Free Traffic Speed Forecasting on METR-LA with Graph Attention, Diffusion and a Hybrid Tree Corrector}
 
-\author{\IEEEauthorblockN{Team T036}
-\IEEEauthorblockA{Newton School of Technology, Rishihood University\\
+\author{\IEEEauthorblockN{Adil Mirza (2401020005), Augustya Purohit (2401010114), Harsh Raj (2401010180),\\
+Sumit Yadav (2401010464), Manas Saxena (2401010260)}
+\IEEEauthorblockA{Team T036, Newton School of Technology, Rishihood University\\
 Code and results: \url{https://github.com/ManasSaxena14/TrafficFlowControl_AIML-DL_T036}}}
 
 \maketitle
@@ -204,8 +205,9 @@ Model & 15 & 30 & 60 & RMSE & MAPE & Peak \\
 \ifdefined\RefFifteen
 \subsection{Reproducing the published DCRNN}
 To check our port, we also train DCRNN under the reference protocol (windows split 70/10/20, scaler including outage
-zeros). It reaches \RefFifteen/\RefThirty/\RefSixty~mph at 15/30/60 minutes, within \RefWorstPct\% of the published
-2.67/3.08/3.56~\cite{li2018dcrnn}. Under our strict protocol the numbers are of the same size, so the stricter split
+zeros). This run stopped after 24 of its 30 epochs; we score its best checkpoint (epoch 22, after the learning-rate drop,
+where validation error had flattened). It reaches \RefFifteen/\RefThirty/\RefSixty~mph at 15/30/60 minutes, within
+\RefWorstPct\% of the published 2.67/3.08/3.56~\cite{li2018dcrnn}. Under our strict protocol the numbers are of the same size, so the stricter split
 costs little but removes the shared target timestamps between splits.
 \fi
 
