@@ -1,0 +1,12 @@
+STGAT, bidirectional edges \textit{(main)} & 65\,420 & 2.838 & 3.320 & 3.955 & -- \\
+no graph (self-loops only) & 65\,420 & 2.967 & 3.547 & 4.351 & +0.397 \\
+forward edges only (hear upstream) & 65\,420 & 2.896 & 3.397 & 4.052 & +0.097 \\
+backward edges only (hear downstream) & 65\,420 & 2.861 & 3.368 & 4.021 & +0.067 \\
+undirected, no direction feature & 65\,420 & 2.864 & 3.368 & 4.043 & +0.088 \\
+random graph, same edge count & 65\,420 & 2.945 & 3.481 & 4.178 & +0.223 \\
+1 attention layer instead of 2 & 56\,716 & 2.869 & 3.388 & 4.108 & +0.153 \\
+no dropout (regularisation off) & 65\,420 & 2.831 & 3.307 & 3.925 & -0.030 \\
+\midrule
+DCRNN, dual random walk, K = 2 \textit{(main)} & 377\,153 & 2.642 & 3.050 & 3.568 & -- \\
+DCRNN, K = 1 hop & 226\,625 & 2.650 & 3.053 & 3.569 & +0.001 \\
+DCRNN, forward walk only & 226\,625 & 2.774 & 3.191 & 3.723 & +0.155 \\

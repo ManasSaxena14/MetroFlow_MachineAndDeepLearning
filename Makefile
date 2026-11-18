@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: setup data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper report dashboard test lint all
+.PHONY: setup data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper dl-report report dashboard test lint all
 
 setup:            ## create the environment (Python 3.11 via uv) and install pinned requirements
 	uv venv --python 3.11 .venv && uv pip install --python $(PY) -r requirements-pipeline.txt
@@ -51,6 +51,10 @@ paper:            ## IEEE-format research paper from results/ -> docs/paper/pape
 	$(PY) scripts/make_paper_tables.py
 	cd docs/paper && tectonic paper.tex
 
+dl-report:        ## DL-phase project report from results/ -> docs/dl_report/dl_report.pdf (brew install tectonic)
+	$(PY) scripts/make_dl_report_tables.py
+	cd docs/dl_report && tectonic dl_report.tex
+
 report:           ## regenerate the report tables from results/ and compile docs/report/report.pdf
 	$(PY) scripts/make_report_tables.py
 	cd docs/report && tectonic report.tex
@@ -64,4 +68,4 @@ test:             ## run the automated tests
 lint:             ## static checks
 	.venv/bin/ruff check src tests scripts app.py
 
-all: data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper report test lint
+all: data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper dl-report report test lint

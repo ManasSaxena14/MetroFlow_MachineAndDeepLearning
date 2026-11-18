@@ -23,3 +23,11 @@ docs/report/*.out
 docs/report/*.bbl
 docs/report/*.blg
 docs/report/*.toc
+
+# LaTeX build artefacts of the DL report
+docs/dl_report/*.aux
+docs/dl_report/*.log
+docs/dl_report/*.out
+docs/dl_report/*.bbl
+docs/dl_report/*.blg
+docs/dl_report/*.toc
