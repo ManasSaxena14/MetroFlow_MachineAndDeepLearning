@@ -726,28 +726,6 @@ def references(prs, d):
                                                 for i, r in enumerate(chunk)])
 
 
-def team(prs, d):
-    s = content(prs, "Team and resources", "The work is divided equally across both phases",
-                "Each member owns one part of the machine-learning phase and one part of the deep-learning phase. "
-                "Everything shown today is in the repository, with a report, a research paper and a live dashboard.")
-    rows = [["Member", "DL phase"],
-            ["Harsh Raj", "STGAT graph attention model, graph layers, attention inspection"],
-            ["Manas Saxena", "fair comparison and day-level significance tests"],
-            ["Adil Mirza", "DCRNN, ablation studies, published-number reproduction"],
-            ["Augustya Purohit", "hybrid DCRNN + XGBoost model, IEEE research paper"],
-            ["Sumit Yadav", "congestion maps, time-space diagram, DL slides"]]
-    tb = table(s, 0.5, 1.5, 5.7, rows, [1.6, 4.1], size=12, row_h=0.42)
-    for i in range(len(rows)):
-        tb.cell(i, 1).text_frame.paragraphs[0].alignment = PP_ALIGN.LEFT
-    card(s, 6.45, 1.5, 3.05, 2.52, name="Resources")
-    text(s, 6.62, 1.62, 2.75, 2.3, [("Resources", {"bold": True, "size": 15}),
-                                    ("Code and results: github.com/ManasSaxena14/\nTrafficFlowControl_AIML-DL_T036",
-                                     {"size": 11, "space": 6}),
-                                    ("DL report: docs/dl_report/dl_report.pdf", {"size": 11, "space": 6}),
-                                    ("Dashboard: trafficflowamldl.streamlit.app", {"size": 11, "space": 6})])
-    text(s, 0.5, 4.4, 9.0, 0.4, "Newton School of Technology, Rishihood University  |  Team T036", size=12, color=GREY)
-
-
 def main() -> None:
     d = load()
     prs = Presentation(str(TEMPLATE))
@@ -760,7 +738,7 @@ def main() -> None:
             if sh.has_text_frame and "AML phase" in sh.text_frame.text:
                 sh.text_frame.paragraphs[0].runs[0].text = FOOTER
     for build in (title_slide, gap, models, protocol, headline_chart, results_table, significance, ablations,
-                  hybrid_results, where, attention, maps, time_space, hypotheses, brief, conclusion, references, team):
+                  hybrid_results, where, attention, maps, time_space, hypotheses, brief, conclusion, references):
         build(prs, d)
     cp = prs.core_properties
     cp.title = "Learning the road network: graph models for traffic forecasting (DL phase)"
