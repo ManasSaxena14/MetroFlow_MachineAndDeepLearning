@@ -7,7 +7,7 @@ graph neural networks that close it, and a hybrid that does best of all.**
 
 [Live dashboard](https://trafficflowamldl.streamlit.app) ·
 [DL report (PDF, 27 pages)](docs/dl_report/dl_report.pdf) ·
-[DL slides (25)](docs/presentation/DL_Graph_Models.pptx) ·
+[DL slides (18)](docs/presentation/DL_Graph_Models.pptx) ·
 [AML report (PDF, 22 pages)](docs/report/report.pdf) ·
 [AML slides (13)](docs/presentation/AML_Traffic_Flow_Forecasting.pptx) ·
 [Research paper, IEEE format (PDF)](docs/paper/paper.pdf)
@@ -350,7 +350,7 @@ every documented number can be regenerated from the files in `results/`.
 | Document | Contents |
 |---|---|
 | [DL report](docs/dl_report/dl_report.pdf) (27 pages) | The deep-learning phase in full: literature, protocol, STGAT, DCRNN and the hybrid with equations and diagrams, results at all 12 horizons, peak vs off-peak, significance, reproduction, ablations, attention, congestion maps, outcomes, limitations and references. Every number is generated from `results/` by `scripts/make_dl_report_tables.py`; `make dl-report` rebuilds it. |
-| [DL slides](docs/presentation/DL_Graph_Models.pptx) (25 slides) | One message per slide, with speaker notes: the gap, the two graph models, the hybrid, results, significance, ablations, attention, maps, outcomes and references. Generated from `results/` by `scripts/make_dl_slides.py`. |
+| [DL slides](docs/presentation/DL_Graph_Models.pptx) (18 slides) | One message per slide, with speaker notes and fade transitions: the gap, the graph models and the hybrid, the protocol, results, peak vs off-peak, significance and the DCRNN reproduction, ablations, attention, congestion maps, outcomes, brief coverage, references and team. Generated from `results/` by `scripts/make_dl_slides.py`. |
 | [AML report](docs/report/report.pdf) (22 pages) | The machine-learning phase: literature review, data, leak-free methodology, the six baselines, the gap analysis, software and deployment. `make report` rebuilds it. |
 | [AML slides](docs/presentation/AML_Traffic_Flow_Forecasting.pptx) (13 slides) | Problem, research foundation, data, leak-free pipeline, baselines, scores, the gap and references. |
 | [Research paper](docs/paper/paper.pdf) (IEEE format) | The whole project in conference format. `make paper` rebuilds it. |

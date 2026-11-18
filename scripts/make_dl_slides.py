@@ -296,153 +296,60 @@ def title_slide(prs, d):
         f"{pct(xg.MAE_60min, hy.MAE_60min):.1f}%.")
 
 
-def roadmap(prs, d):
-    s = content(prs, "From sensors to the road graph", "The brief's hybrid logic, in three steps",
-                "Steps one and two were the AML phase: strong per-sensor baselines and a measured gap. This deck is step "
-                "three: graph deep learning, a hybrid of graph model and trees, and one fair comparison of everything.")
-    steps = [("AML baseline", "XGBoost per horizon and a multi-output Random Forest on lagged speed, time and segment "
-              "features", "Done"),
-             ("Identify the gap", "Per-sensor models miss how congestion moves between upstream and downstream links",
-              "Done"),
-             ("Graph deep learning", "STGAT and DCRNN over the fixed road graph, a hybrid, and one fair comparison",
-              "This deck")]
-    for i, (h, b, tag) in enumerate(steps):
-        x = 0.5 + i * 3.05
-        last = i == 2
-        card(s, x, 1.5, 2.85, 2.6, name=f"Step {i}", fill=WHITE if last else TINT, line=ORANGE if last else None)
-        badge(s, x + 0.2, 1.68, i + 1, fill=ORANGE if last else GREY)
-        pill(s, x + 1.6, 1.74, 1.05, tag, fill=ORANGE if last else GREY, size=11)
-        text(s, x + 0.2, 2.3, 2.45, 1.75, [(h, {"bold": True, "size": 16, "head": True}), (b, {"size": 12, "space": 6})])
-        if not last:
-            arrow(s, x + 2.87, 2.8, x + 3.03, 2.8)
-    takeaway(s, "Question: does a model that reads the road graph close the gap, under exactly the same rules?")
-
-
 def gap(prs, d):
-    f, ons, p4 = d["final"], d["ons"], d["p4"]
+    f, ons, p4, pr = d["final"], d["ons"], d["p4"], d["p1"]["propagation"]
     xg, xn = f.loc[XGB], f.loc["XGBoost + neighbours"]
     o = ons[ons.model == XGB].pivot(index="minutes", columns="group", values="mae")
     ratio = o.onset / o.normal
-    s = content(prs, "Per-sensor models miss the neighbours", "What the AML phase measured about the best one, XGBoost",
-                "XGBoost is the strongest model that looks at one sensor at a time. It is very good in normal traffic but "
-                "several times worse right after a jam starts, exactly when a forecast matters. Hand-made neighbour "
-                "features help a little, which tells us the missing information is spatial.")
-    stat(s, 0.5, 1.5, 2.85, 1.45, trio(xg), "XGBoost test MAE (mph) at 15, 30 and 60 min: the bar to beat",
-         num_size=22, name="XGB")
-    stat(s, 3.575, 1.5, 2.85, 1.45, f"{ratio.min():.1f} to {ratio.max():.1f}x",
-         f"larger error in the 30 min after a congestion onset ({p4['test_onsets']:,} onsets in the test block)",
-         num_size=22, name="Onset")
-    stat(s, 6.65, 1.5, 2.85, 1.45, f"-{pct(xg.MAE_15min, xn.MAE_15min):.1f}%",
-         "error at 15 min when hand-made neighbour speeds are added: helpful, but only part of it", num_size=22, name="Nb")
-    text(s, 0.5, 3.2, 9.0, 1.0, [("Why?", {"bold": True, "size": 15}),
-                                 ("A per-sensor model only sees its own past. It cannot see a slowdown that has already "
-                                  "started one link away and is travelling towards it.", {"size": 13, "space": 3})])
-    takeaway(s, "The missing information is spatial: the case for a model that learns from the road graph.")
-
-
-def propagation(prs, d):
-    pr = d["p1"]["propagation"]
-    s = content(prs, "Jams travel backwards", "So a sensor must listen downstream; measured on METR-LA, training period",
-                "On strongly coupled road links the downstream sensor slows first about four times as often as the "
-                "upstream one, and the slowdown reaches the upstream sensor about ten minutes later. This is a queue "
-                "growing back from a bottleneck, and it drives one design choice of our model.")
-    picture(s, FIG / "fig05d_propagation_example.png", 0.45, 1.45, w=5.9)
-    stat(s, 6.6, 1.45, 2.9, 1.15, f"{pr['downstream_first']} vs {pr['upstream_first']}",
-         "links where the downstream sensor slows first vs the upstream one", num_size=24, name="First")
-    stat(s, 6.6, 2.72, 2.9, 1.15, f"{pr['median_lag_min']:.0f} min", "median delay before the jam reaches the "
-         "upstream sensor", num_size=24, name="Lag")
-    stat(s, 6.6, 3.99, 2.9, 1.0, f"{pr['shockwave_kmh']:.0f} km/h", "speed of the backward-moving jam", num_size=24,
-         name="Wave")
+    s = content(prs, "Per-sensor models miss the neighbours", "What the AML phase measured: jams travel backwards along the road",
+                "The brief's hybrid logic: per-sensor baselines first, a measured gap second, graph learning third. XGBoost "
+                "is the strongest model that looks at one sensor at a time, but it is several times worse right after a "
+                "jam starts. The figure shows why: the downstream sensor slows first and the jam reaches the upstream "
+                "sensor about ten minutes later. Hand-made neighbour features help only a little.")
+    picture(s, FIG / "fig05d_propagation_example.png", 0.45, 1.45, w=5.7)
+    stat(s, 6.45, 1.45, 3.05, 0.92, trio(xg), "XGBoost MAE (mph), 15 / 30 / 60 min: the bar to beat", num_size=20,
+         name="XGB")
+    stat(s, 6.45, 2.47, 3.05, 0.92, f"{ratio.min():.1f} to {ratio.max():.1f}x",
+         f"its error after a congestion onset ({p4['test_onsets']:,} onsets)", num_size=20, name="Onset")
+    stat(s, 6.45, 3.49, 3.05, 0.92, f"{pr['downstream_first']} vs {pr['upstream_first']}",
+         f"links where the downstream sensor slows first; jam moves back at {pr['shockwave_kmh']:.0f} km/h",
+         num_size=20, name="First")
+    takeaway(s, f"Neighbour features help by only {pct(xg.MAE_15min, xn.MAE_15min):.1f}%: can a model that reads the "
+             "road graph close the gap?", y=4.5, h=0.5)
 
 
 # --------------------------------------------------------------------------- 2. method
 def models(prs, d):
     ab = d["abl"].set_index("run")
-    s = content(prs, "Two graph models, one road graph",
-                "Same input (60 min, 207 sensors), same output (12 horizons), same fixed adjacency",
-                "STGAT is our graph attention network: a GRU summarises each sensor's last hour, then two GATv2 layers "
-                "let every sensor attend to its road neighbours, in both directions. DCRNN is the reference diffusion "
-                "model: the graph enters every GRU step through forward and backward random walks. Both are written "
-                "in plain PyTorch; our attention layer is tested to equal PyTorch Geometric's GATv2Conv.")
-    cols = [("STGAT (ours)", "graph attention network", ORANGE, ab.loc["stgat_s0", "parameters"], [
+    s = content(prs, "Two graph models and a hybrid", "Same input (60 min, 207 sensors), same output (12 horizons), same road graph",
+                "STGAT is our graph attention network: a GRU summarises each sensor's last hour, then two GATv2 layers let "
+                "every sensor attend to its road neighbours over both directions of every link, because jams arrive from "
+                "downstream. DCRNN is the reference diffusion model: the graph enters every GRU step. The hybrid keeps "
+                "DCRNN and adds a small XGBoost per horizon that learns its residual; it is fitted on the validation block "
+                "only, so no test information leaks.")
+    cols = [("STGAT (ours)", "graph attention", ORANGE, f"{ab.loc['stgat_s0', 'parameters'] / 1000:.0f}k params", [
         ("Remember", "a shared GRU summarises each sensor's last hour"),
-        ("Listen", "2 GATv2 layers attend to upstream and downstream neighbours"),
+        ("Listen", "2 GATv2 layers over both directions of each link"),
         ("Predict", "12 horizons as the change from the last speed")]),
-        ("DCRNN (Li et al., 2018)", "diffusion on the graph", AQUA, ab.loc["dcrnn_s0", "parameters"], [
+        ("DCRNN", "diffusion (Li et al., 2018)", AQUA, f"{ab.loc['dcrnn_s0', 'parameters'] / 1000:.0f}k params", [
         ("Diffuse", "forward and backward random walks, 2 hops"),
         ("Recur", "the graph enters every encoder and decoder step"),
-        ("Decode", "12 horizons one by one, with scheduled sampling")])]
-    for k, (name, kind, color, params, steps) in enumerate(cols):
-        x = 0.5 + k * 4.6
-        card(s, x, 1.5, 4.4, 3.4, name=f"{name} card")
-        shape(s, MSO_SHAPE.RECTANGLE, x, 1.62, 0.08, 3.16, color, name=f"{name} bar")
-        text(s, x + 0.3, 1.62, 2.75, 0.65, [(name, {"bold": True, "size": 17, "head": True}),
-                                           (kind, {"size": 12, "color": GREY, "space": 1})])
-        pill(s, x + 3.05, 1.68, 1.15, f"{params / 1000:.0f}k params", fill=color, size=11)
+        ("Decode", "12 horizons, with scheduled sampling")]),
+        ("Hybrid (ours)", "graph model + trees", RED, "fit on val only", [
+        ("Backbone", "the DCRNN forecast: the spatial view"),
+        ("Correct", "XGBoost per horizon learns DCRNN's error"),
+        ("Regularise", "depth 3, 200+ samples per leaf: no overfitting")])]
+    for k, (name, kind, color, tag, steps) in enumerate(cols):
+        x = 0.5 + k * 3.05
+        card(s, x, 1.5, 2.85, 3.45, name=f"{name} card")
+        shape(s, MSO_SHAPE.RECTANGLE, x + 0.2, 1.5, 2.45, 0.08, color, name=f"{name} bar")
+        text(s, x + 0.2, 1.7, 2.45, 0.6, [(name, {"bold": True, "size": 16, "head": True}),
+                                          (kind, {"size": 11, "color": GREY, "space": 1})])
+        pill(s, x + 0.2, 2.35, 1.5, tag, fill=color, h=0.27, size=10)
         for i, (t1, t2) in enumerate(steps):
-            yy = 2.45 + i * 0.8
-            badge(s, x + 0.3, yy + 0.04, i + 1, fill=color, d=0.38, size=13)
-            text(s, x + 0.85, yy, 3.4, 0.75, [(t1, {"bold": True, "size": 14}), (t2, {"size": 12, "space": 1})])
-
-
-def stgat_diagram(prs, d):
-    ab = d["abl"].set_index("run")
-    s = content(prs, "How STGAT reads the road", "Attention decides how much each neighbour matters, in both directions",
-                "Raw message passing would only let a sensor hear its upstream neighbours. Because jams arrive from "
-                "downstream, we add every road link in both directions and give each edge two features: the link "
-                "weight and whether it points backwards. The attention learns how much each direction is worth.")
-    boxes = [("12 x 7 inputs", "per sensor", TINT, INK), ("GRU", "own history", TINT, INK),
-             ("GATv2 x 2", "listen to neighbours", ORANGE, WHITE), ("Head", "12 horizons", TINT, INK)]
-    for i, (h, b, fill, col) in enumerate(boxes):
-        x = 0.5 + i * 2.33
-        card(s, x, 1.55, 1.95, 0.95, fill=fill, name=f"Block {i}")
-        text(s, x, 1.55, 1.95, 0.95, [(h, {"bold": True, "size": 15, "color": col, "align": PP_ALIGN.CENTER}),
-                                      (b, {"size": 11, "color": col, "align": PP_ALIGN.CENTER, "space": 2})],
-             anchor=MSO_ANCHOR.MIDDLE)
-        if i < 3:
-            arrow(s, x + 1.98, 2.02, x + 2.3, 2.02)
-    xs = [1.0, 3.2, 5.4]
-    for i, x in enumerate(xs):
-        shape(s, MSO_SHAPE.OVAL, x, 3.25, 0.5, 0.5, RED if i == 2 else BLUE, name=f"Node {i}")
-        text(s, x - 0.45, 3.85, 1.4, 0.3, ["upstream", "sensor i", "downstream"][i], size=12, color=GREY,
-             align=PP_ALIGN.CENTER)
-    for i in range(2):
-        arrow(s, xs[i] + 0.58, 3.37, xs[i + 1] - 0.08, 3.37, color=GREY)
-        arrow(s, xs[i + 1] - 0.08, 3.63, xs[i] + 0.58, 3.63, color=ORANGE, width=2.5)
-    text(s, 0.5, 2.78, 2.2, 0.3, "grey: traffic direction", size=12, color=GREY)
-    text(s, 2.75, 2.78, 3.8, 0.3, "orange: reverse messages we add", size=12, bold=True, color=ORANGE)
-    card(s, 6.65, 2.78, 2.85, 1.42, name="Edge note")
-    text(s, 6.82, 2.88, 2.55, 1.25, [("Edge features", {"bold": True, "size": 14}),
-                                     ("[link weight, is_reverse]: attention can treat the two directions differently",
-                                      {"size": 12, "space": 3})])
-    text(s, 0.5, 4.45, 9.0, 0.45, f"{ab.loc['stgat_s0', 'parameters']:,} parameters. Attending once, after the GRU, is "
-         "about 8x cheaper than at every input step, which made 3 seeds and 7 ablations affordable.", size=12, color=GREY)
-
-
-def hybrid_design(prs, d):
-    s = content(prs, "Hybrid: a graph model corrected by trees",
-                "DCRNN is the backbone; a small XGBoost learns where it is systematically wrong",
-                "DCRNN is the best single model, but the tree model knows the calendar well and errs differently. "
-                "Following stacked generalisation, a shallow XGBoost per horizon learns DCRNN's residual from a few "
-                "inputs: current speed, recent change, time of day, weekend, free-flow speed and both forecasts. It "
-                "must see forecasts DCRNN was not trained on, so it is fitted on the validation block only.")
-    flow = [("DCRNN forecast", "the spatial view", AQUA), ("+ tree correction", "the calendar view", BLUE),
-            ("Hybrid forecast", "best of both", RED)]
-    for i, (h, b, c) in enumerate(flow):
-        x = 0.5 + i * 3.05
-        card(s, x, 1.55, 2.75, 1.05, name=f"Flow {i}")
-        badge(s, x + 0.18, 1.86, i + 1, fill=c)
-        text(s, x + 0.75, 1.55, 1.9, 1.05, [(h, {"bold": True, "size": 15}), (b, {"size": 12, "space": 2, "color": GREY})],
-             anchor=MSO_ANCHOR.MIDDLE)
-        if i < 2:
-            arrow(s, x + 2.78, 2.07, x + 3.02, 2.07)
-    rules = [("Small and regularised", "depth 3, at least 200 samples per leaf, L2 = 10"),
-             ("No leakage", "fitted on validation windows DCRNN never trained on; test scored once"),
-             ("One model per horizon", "12 correctors, each with early stopping on held-out validation windows")]
-    for i, (h, b) in enumerate(rules):
-        x = 0.5 + i * 3.05
-        text(s, x, 2.9, 2.75, 1.3, [(h, {"bold": True, "size": 14}), (b, {"size": 12, "space": 3})])
-    takeaway(s, "The corrector learns when to trust the trees' calendar view over the graph's spatial view.")
+            yy = 2.8 + i * 0.7
+            badge(s, x + 0.2, yy + 0.03, i + 1, fill=color, d=0.34, size=12)
+            text(s, x + 0.66, yy, 2.05, 0.68, [(t1, {"bold": True, "size": 13}), (t2, {"size": 11, "space": 1})])
 
 
 def protocol(prs, d):
@@ -507,104 +414,55 @@ def results_table(prs, d):
     s = content(prs, "Results at a glance", "Test block, mph; graph models and hybrid: mean of 3 seeds; best in bold",
                 "MAE is the headline. RMSE weighs rare large misses: at 60 minutes DCRNN's RMSE is above XGBoost's because "
                 "its rarer misses, mostly when a jam starts, are larger; the hybrid brings it down. Peak means weekdays "
-                "07:00 to 09:59 and 16:00 to 19:59, judged on the predicted time.")
+                "07:00 to 09:59 and 16:00 to 19:59, judged on the predicted time. Every model is weakest at peak hours, "
+                "and that is where the graph models help most.")
     order = ["LSTM (no graph)", XGB, "XGBoost + neighbours", "STGAT (ours)", "DCRNN", HYBRID]
-    rows = [["Model", "MAE 15 min", "MAE 30 min", "MAE 60 min", "RMSE 60 min", "Peak MAE 60"]]
+    rows = [["Model", "MAE 15", "MAE 30", "MAE 60", "RMSE 60", "Peak 60", "Off-peak 60"]]
     for m in order:
         r = f.loc[m]
-        rows.append([SHORT[m], f2(r.MAE_15min), f2(r.MAE_30min), f2(r.MAE_60min), f2(r.RMSE_60min), f2(r.peak_MAE_60min)])
-    table(s, 0.5, 1.5, 9.0, rows, [2.9, 1.2, 1.2, 1.2, 1.25, 1.25], best_cols=(1, 2, 3, 4, 5), size=13, row_h=0.36,
-          highlight=(6,))
-    text(s, 0.5, 4.08, 9.0, 0.3, "Top three: no spatial input (LSTM, XGBoost) and hand-made neighbour features. Bottom "
-         "three: graph models. All ten models: results/final.csv.", size=11, color=GREY)
-    takeaway(s, f"The hybrid is best on MAE at every horizon and at peak hours: {trio(f.loc[HYBRID])} mph.", y=4.48, h=0.48)
-
-
-def peak(prs, d):
-    f = d["final"]
-    s = content(prs, "Biggest gains when traffic is hardest", "Test MAE (mph) at 60 minutes, by period",
-                "Every model is weakest at weekday peak hours, when forecasts matter most. That is also where the graph "
-                "models help most: the hybrid's peak-hour error is about a sixth lower than XGBoost's.")
-    models_ = [XGB, "STGAT (ours)", "DCRNN", HYBRID]
-    cd = CategoryChartData()
-    cd.categories = ["weekday peak", "weekday off-peak", "weekend"]
-    for m in models_:
-        r = f.loc[m]
-        cd.add_series(SHORT[m], [round(r.peak_MAE_60min, 2), round(r.offpeak_MAE_60min, 2), round(r.weekend_MAE_60min, 2)])
-    ch = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(0.4), Inches(1.4), Inches(6.3), Inches(3.6), cd).chart
-    style_chart(ch)
-    color_series(ch, [MODEL_COLOR[m] for m in models_])
-    pl = ch.plots[0]
-    pl.gap_width = 70
-    pl.overlap = -8
-    labels(pl, "0.0", 9)
-    ch.value_axis.minimum_scale = 0
-    xg, hy, dc = f.loc[XGB], f.loc[HYBRID], f.loc["DCRNN"]
-    stat(s, 6.9, 1.45, 2.6, 1.15, f"-{pct(xg.peak_MAE_60min, hy.peak_MAE_60min):.1f}%",
-         f"hybrid vs XGBoost at peak ({f2(hy.peak_MAE_60min)} vs {f2(xg.peak_MAE_60min)} mph)", name="Peak")
-    stat(s, 6.9, 2.72, 2.6, 1.15, f"-{pct(xg.peak_MAE_60min, dc.peak_MAE_60min):.1f}%", "DCRNN vs XGBoost at peak",
-         name="DcPeak")
-    ratio = f.peak_MAE_60min / f.offpeak_MAE_60min
-    stat(s, 6.9, 3.99, 2.6, 1.0, f"{ratio.min():.2f} to {ratio.max():.2f}x", "peak vs off-peak error, every model",
-         num_size=22, name="Ratio")
+        rows.append([SHORT[m], f2(r.MAE_15min), f2(r.MAE_30min), f2(r.MAE_60min), f2(r.RMSE_60min),
+                     f2(r.peak_MAE_60min), f2(r.offpeak_MAE_60min)])
+    table(s, 0.5, 1.5, 9.0, rows, [2.7, 1.0, 1.0, 1.0, 1.05, 1.05, 1.2], best_cols=(1, 2, 3, 4, 5, 6), size=13,
+          row_h=0.36, highlight=(6,))
+    xg, hy = f.loc[XGB], f.loc[HYBRID]
+    text(s, 0.5, 4.08, 9.0, 0.3, "Top three: no graph (LSTM, XGBoost) and hand-made neighbour features. Bottom three: "
+         "graph models. All ten models: results/final.csv.", size=11, color=GREY)
+    takeaway(s, f"The hybrid is best on MAE at every horizon and cuts peak-hour error by "
+             f"{pct(xg.peak_MAE_60min, hy.peak_MAE_60min):.1f}% against XGBoost.", y=4.48, h=0.48)
 
 
 def significance(prs, d):
-    sig, p6 = d["sig"], d["p6"]
-    s = content(prs, "Better on every single test day", "Paired tests over the 24 test days; worst of 3 seeds reported",
+    sig, ref = d["sig"], d["p5"]["reference_check"]
+    s = content(prs, "Reliable, and built on a faithful DCRNN", "Paired tests over the 24 test days (worst of 3 seeds); "
+                "check against the published DCRNN",
                 "Errors within a day are strongly correlated, so a day, not a single prediction, is the unit. We compare "
-                "daily errors with a paired bootstrap (10,000 resamples) and a Diebold-Mariano test with the small-sample "
-                "correction, for every seed, and report the worst seed.")
+                "daily errors with a paired bootstrap (10,000 resamples) and a Diebold-Mariano test, for every seed, and "
+                "report the worst seed. To check our DCRNN port we also trained it under the paper's own protocol: it "
+                "lands within 1.5% of the published numbers.")
 
     def days(model, base, minutes=None):
         r = sig[(sig.model == model) & (sig.baseline == base)]
         if minutes:
             r = r[r.minutes == minutes]
-        return int(r.days_model_better.min()), int(r.test_days.max()), float(r.p_bootstrap.max()), float(r.p_dm.max())
+        return int(r.days_model_better.min()), int(r.test_days.max()), max(float(r.p_bootstrap.max()), float(r.p_dm.max()))
 
-    cards = [("DCRNN vs XGBoost", days("DCRNN", XGB), "at 15, 30 and 60 min", AQUA),
-             ("Hybrid vs DCRNN", days(HYBRID, "DCRNN (same seed)"), "at 15, 30 and 60 min", RED),
-             ("STGAT vs XGBoost, 60 min", days("STGAT (ours)", XGB, 60), "a weak gain at the longest horizon", ORANGE)]
-    for i, (h, (b, n, pb, pdm), sub, c) in enumerate(cards):
-        x = 0.5 + i * 3.05
-        card(s, x, 1.5, 2.85, 2.6, name=f"Sig {i}")
-        shape(s, MSO_SHAPE.RECTANGLE, x + 0.2, 1.5, 2.45, 0.08, c, name=f"Sig bar {i}")
-        text(s, x + 0.2, 1.72, 2.45, 0.35, h, size=14, bold=True)
-        text(s, x + 0.2, 2.12, 2.45, 0.7, f"{b} / {n}", size=34, bold=True, head=True)
-        ptxt = "p < 0.0001 (both tests)" if max(pb, pdm) < 1e-4 else f"p = {pb:.3f} bootstrap, {pdm:.3f} DM"
-        text(s, x + 0.2, 2.95, 2.45, 1.1, [(f"days better, {sub}", {"size": 12}),
-                                           (ptxt, {"size": 12, "bold": True, "space": 4})])
-    takeaway(s, f"DCRNN's {p6['gain_15min_pct']:.1f}% / {p6['gain_30min_pct']:.1f}% / {p6['gain_60min_pct']:.1f}% gain "
-             "over XGBoost is not luck: it holds on every test day.")
-
-
-def reproduction(prs, d):
-    ref, f = d["p5"]["reference_check"], d["final"]
-    s = content(prs, "Our DCRNN matches the paper", "Test MAE (mph): published paper vs our PyTorch port",
-                "To check the port we also trained DCRNN under the paper's own protocol: a window-level split and a scaler "
-                "that includes the outage zeros. It lands within 1.5% of the published numbers. Our stricter protocol, "
-                "used for every other result, costs about half a percent but removes the overlap between training and "
-                "validation targets.")
-    cd = CategoryChartData()
-    cd.categories = ["15 min", "30 min", "60 min"]
-    cd.add_series("Published (Li et al., 2018)", [ref[f"{m}min"]["published"] for m in (15, 30, 60)])
-    cd.add_series("Ours, paper's protocol", [ref[f"{m}min"]["ours"] for m in (15, 30, 60)])
-    cd.add_series("Ours, strict protocol (3 seeds)", [round(f.loc["DCRNN", f"MAE_{m}min"], 2) for m in (15, 30, 60)])
-    ch = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(0.4), Inches(1.4), Inches(6.3), Inches(3.6), cd).chart
-    style_chart(ch)
-    color_series(ch, [GREY, AQUA, BLUE])
-    pl = ch.plots[0]
-    pl.gap_width = 70
-    pl.overlap = -8
-    labels(pl, "0.00", 10)
-    ch.value_axis.minimum_scale = 0
     worst = max(abs(v["diff_pct"]) for v in ref.values())
-    stat(s, 6.9, 1.45, 2.6, 1.35, f"within {worst:.1f}%", "of the published METR-LA numbers at every horizon",
-         num_size=24, name="Ref")
-    card(s, 6.9, 2.95, 2.6, 2.05, name="Ref note")
-    text(s, 7.05, 3.05, 2.3, 1.9, [("Why it matters", {"bold": True, "size": 14}),
-                                   ("Our gains over XGBoost come from a faithful DCRNN, not from a weak or broken "
-                                    "implementation.", {"size": 12, "space": 3})])
+    ours = " | ".join(f2(ref[f"{m}min"]["ours"]) for m in (15, 30, 60))
+    pub = " | ".join(f2(ref[f"{m}min"]["published"]) for m in (15, 30, 60))
+    cards = []
+    for h, (b, n, p), sub, c in (("DCRNN vs XGBoost", days("DCRNN", XGB), "days better at every horizon", AQUA),
+                                 ("Hybrid vs DCRNN", days(HYBRID, "DCRNN (same seed)"), "days better at every horizon", RED),
+                                 ("STGAT vs XGBoost", days("STGAT (ours)", XGB, 60), "days better at 60 min: weak", ORANGE)):
+        cards.append((h, f"{b} / {n}", sub, "p < 0.0001" if p < 1e-4 else f"p up to {p:.3f}", c))
+    cards.append(("Published DCRNN", f"{worst:.1f}%", f"largest gap: ours {ours} vs published {pub} mph", "", BLUE))
+    for i, (h, big, sub, ptxt, c) in enumerate(cards):
+        x = 0.5 + i * 2.3
+        card(s, x, 1.5, 2.15, 2.75, name=f"Sig {i}")
+        shape(s, MSO_SHAPE.RECTANGLE, x + 0.18, 1.5, 1.79, 0.08, c, name=f"Sig bar {i}")
+        text(s, x + 0.18, 1.72, 1.85, 0.35, h, size=13, bold=True)
+        text(s, x + 0.18, 2.1, 1.85, 0.6, big, size=30, bold=True, head=True)
+        text(s, x + 0.18, 2.85, 1.85, 1.35, [(sub, {"size": 11}), (ptxt, {"size": 12, "bold": True, "space": 4})])
+    takeaway(s, "DCRNN beats XGBoost on every test day, and our port matches the published paper.", y=4.48, h=0.48)
 
 
 # --------------------------------------------------------------------------- 4. why it works
@@ -732,30 +590,20 @@ def attention(prs, d):
 
 # --------------------------------------------------------------------------- 5. maps
 def maps(prs, d):
-    p7 = d["p7"]["side_by_side"]
+    p7, em = d["p7"]["side_by_side"], d["p7"]["error_map"]
     s = content(prs, "Who sees the rush hour coming?", f"Congestion levels, {pd.Timestamp(p7['target_time']):%a %d %b %Y, %H:%M}; "
                 f"forecasts made {p7['horizon_min']} minutes earlier",
                 "The moment is fixed by a rule: the weekday PM-peak test time with the most congested sensors, not the "
                 "moment where our model looks best. Congestion level is speed divided by the sensor's own free-flow "
-                "speed.")
+                f"speed. Over the whole test block DCRNN has the lower 60-minute error at {em['sensors_graph_better']} of "
+                f"{em['sensors']} sensors, a median gain of {em['median_gain_mph']:.2f} mph per sensor (error map in the "
+                "report, figure 19).")
     pic = picture(s, FIG / "fig18_congestion_map_side_by_side.png", 0.3, 1.4, h=2.9)
     pic.left = int((prs.slide_width - pic.width) / 2)
     xg, dc = p7["XGBoost"], p7["DCRNN"]
-    takeaway(s, f"Of {p7['actual_congested']} congested sensors, XGBoost caught {xg['congested_caught']} and DCRNN "
-             f"caught {dc['congested_caught']}.", y=4.45, h=0.5)
-
-
-def error_map(prs, d):
-    em = d["p7"]["error_map"]
-    s = content(prs, "Better at almost every sensor", "60-min error of XGBoost minus DCRNN per sensor, whole test block",
-                "Blue sensors are where DCRNN is better. The largest gains lie along the main freeway corridors; the few "
-                "sensors where XGBoost is better sit at the edges of the network, including the one isolated sensor "
-                "that has no neighbours to learn from.")
-    picture(s, FIG / "fig19_error_map.png", 0.4, 1.4, h=3.6)
-    stat(s, 6.95, 1.45, 2.55, 1.4, f"{em['sensors_graph_better']} / {em['sensors']}", "sensors where DCRNN has the lower "
-         "60-min error", num_size=26, name="Sensors")
-    stat(s, 6.95, 3.0, 2.55, 1.4, f"{em['median_gain_mph']:.2f} mph", "median improvement per sensor", num_size=26,
-         name="Median")
+    takeaway(s, f"Of {p7['actual_congested']} congested sensors, XGBoost caught {xg['congested_caught']}, DCRNN "
+             f"{dc['congested_caught']}; DCRNN is better at {em['sensors_graph_better']} of {em['sensors']} sensors.",
+             y=4.45, h=0.5)
 
 
 def time_space(prs, d):
@@ -911,9 +759,8 @@ def main() -> None:
         for sh in lay.shapes:
             if sh.has_text_frame and "AML phase" in sh.text_frame.text:
                 sh.text_frame.paragraphs[0].runs[0].text = FOOTER
-    for build in (title_slide, roadmap, gap, propagation, models, stgat_diagram, hybrid_design, protocol,
-                  headline_chart, results_table, peak, significance, reproduction, ablations, hybrid_results, where,
-                  attention, maps, error_map, time_space, hypotheses, brief, conclusion, references, team):
+    for build in (title_slide, gap, models, protocol, headline_chart, results_table, significance, ablations,
+                  hybrid_results, where, attention, maps, time_space, hypotheses, brief, conclusion, references, team):
         build(prs, d)
     cp = prs.core_properties
     cp.title = "Learning the road network: graph models for traffic forecasting (DL phase)"
