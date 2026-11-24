@@ -25,7 +25,7 @@ def page() -> None:
 - **Split by time.** 70% train, 10% validation, 20% test: the last 24 days. Windows whose targets cross a boundary are dropped, so no target is in two blocks.
 - **Nothing from the future.** The scaler, the imputation table and the free-flow speeds use training data only.
 - **Choices on validation.** Hyper-parameters, early stopping and thresholds never see the test block.
-- **Days, not rows.** Significance and the alert intervals resample whole days, because errors within a day move together.
+- **Days, not rows.** Significance tests resample whole days, because errors within a day move together.
 """)
     st.subheader("Splits")
     st.dataframe(pd.DataFrame([("Train", 22933, "1 Mar 2012", "23 May 2012"), ("Validation", 3417, "23 May 2012", "4 Jun 2012"), ("Test", 6843, "4 Jun 2012", "27 Jun 2012")],
