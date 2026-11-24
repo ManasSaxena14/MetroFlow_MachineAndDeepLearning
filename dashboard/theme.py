@@ -94,6 +94,11 @@ h3 {{ letter-spacing: -0.01em; padding: 1.9rem 0 .25rem; line-height: 1.3; }}
 [data-testid="stAlert"] code {{ color: {INK}; background: {RAISED}; }}
 .st-key-mapbox [data-testid="stPlotlyChart"] {{ border: 1px solid {LINE}; border-radius: 8px; overflow: hidden; }}
 
+@media (max-width: 1000px) {{
+  [data-testid="stHorizontalBlock"] {{ flex-wrap: wrap; }}
+  [data-testid="stColumn"] {{ min-width: min(100%, 22rem); }}
+  .readout .row span:last-child {{ font-size: 1.45rem; }}
+}}
 @media (max-width: 640px) {{
   [data-testid="stMainBlockContainer"] {{ padding-left: 1.1rem; padding-right: 1.1rem; padding-top: 5.2rem; }}
   [data-testid="stToolbar"]::before {{ margin-left: .5rem; padding-right: .8rem; }}

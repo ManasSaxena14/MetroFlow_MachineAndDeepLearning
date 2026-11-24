@@ -17,7 +17,7 @@ def example(ex) -> go.Figure:
     for c, n, colr in (("downstream", "Downstream sensor", T.RED), ("upstream", "Upstream sensor, 1.5 km before it", T.MODEL["DCRNN"])):
         fig.add_trace(go.Scatter(x=ex.time, y=ex[c], mode="lines+markers", name=n, line=dict(color=colr, width=2.4), marker=dict(size=6),
                                  hovertemplate=n + ", %{x|%H:%M}: %{y:.0f} mph<extra></extra>"))
-    for when, colr, text, anchor in (("2012-05-02 06:40", T.RED, "reaches downstream 06:40", "right"), ("2012-05-02 06:50", T.MODEL["DCRNN"], "reaches upstream 06:50", "left")):
+    for when, colr, text, anchor in (("2012-05-02 06:40", T.RED, "06:40", "right"), ("2012-05-02 06:50", T.MODEL["DCRNN"], "06:50", "left")):
         fig.add_vline(x=when, line=dict(color=colr, width=1.2, dash="dot"))
         fig.add_annotation(x=when, y=3, text=text, showarrow=False, xanchor=anchor, xshift=-6 if anchor == "right" else 6, font=dict(color=T.INK_2, size=13))
     T.style(fig, 340, y="mph")
