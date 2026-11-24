@@ -1,0 +1,24 @@
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#1fae7e"
+backgroundColor = "#0c0e0f"
+secondaryBackgroundColor = "#15181a"
+textColor = "#f2f0eb"
+linkColor = "#5fd3a8"
+borderColor = "#2a2f32"
+dataframeBorderColor = "#23282b"
+dataframeHeaderBackgroundColor = "#15181a"
+baseRadius = "6px"
+buttonRadius = "6px"
+font = "'Mona Sans':https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,300..800&display=swap"
+headingFont = "'Mona Sans'"
+baseFontSize = 16
+baseFontWeight = 400
+headingFontSizes = ["2.75rem", "1.6rem", "1.2rem", "1rem", "0.95rem", "0.9rem"]
+headingFontWeights = [500, 500, 550, 600, 600, 600]
