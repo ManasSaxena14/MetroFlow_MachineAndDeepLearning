@@ -1,4 +1,4 @@
-# environment and tool caches
+# environment and caches
 .venv/
 __pycache__/
 *.pyc
@@ -7,27 +7,11 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# data is downloaded by scripts/download_data.sh and rebuilt by `make preprocess`, never committed
-data/raw/
-data/processed/
+# data is downloaded by scripts/download_data.sh and rebuilt by `make preprocess`
+data/
 ref/
 
-# model checkpoints and run logs
+# generated locally, never committed
 checkpoints/
 logs/
-
-# LaTeX build artefacts
-docs/report/*.aux
-docs/report/*.log
-docs/report/*.out
-docs/report/*.bbl
-docs/report/*.blg
-docs/report/*.toc
-
-# LaTeX build artefacts of the DL report
-docs/dl_report/*.aux
-docs/dl_report/*.log
-docs/dl_report/*.out
-docs/dl_report/*.bbl
-docs/dl_report/*.blg
-docs/dl_report/*.toc
+outputs/

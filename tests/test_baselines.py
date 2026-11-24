@@ -1,12 +1,12 @@
-"""Phase 3 checks: the feature table is aligned and leak-free, and the simple baselines behave."""
+"""Baseline checks: the feature table is aligned and leak-free, and the simple baselines behave."""
 import numpy as np
 import pytest
 
-from src.data import preprocess as pp
-from src.data.load import load_speed
-from src.eval.evaluate import evaluate_rows
-from src.features import build as fb
-from src.models import simple
+from metroflow.data import preprocess as pp
+from metroflow.data.load import load_speed
+from metroflow.eval.evaluate import evaluate_rows
+from metroflow.features import build as fb
+from metroflow.models import simple
 
 SUBSET = 3000
 
@@ -107,9 +107,9 @@ def test_ridge_recovers_a_linear_signal():
     assert np.abs(m.predict(F) - Y).mean() < 0.05
 
 
-# ----------------------------------------------------------------------------- trees (commit 2)
+# ----------------------------------------------------------------------------- trees
 def _toy(n_windows=24, seed=0):
-    from src.models.trees import N_SENSORS
+    from metroflow.models.trees import N_SENSORS
     rng = np.random.default_rng(seed)
     F = rng.normal(size=(n_windows * N_SENSORS, len(fb.FEATURE_NAMES))).astype(np.float32)
     Y = np.stack([F[:, 0] * (1 + 0.1 * h) + 3 for h in range(12)], axis=1).astype(np.float32)
@@ -118,13 +118,13 @@ def _toy(n_windows=24, seed=0):
 
 
 def test_window_stride_rows_keeps_whole_windows():
-    from src.models.trees import N_SENSORS, window_stride_rows
+    from metroflow.models.trees import N_SENSORS, window_stride_rows
     idx = window_stride_rows(10 * N_SENSORS, 3)
     assert len(idx) == 4 * N_SENSORS and idx[0] == 0 and idx[N_SENSORS] == 3 * N_SENSORS
 
 
 def test_xgb_per_horizon_learns_and_ignores_masked_targets():
-    from src.models.trees import XGBPerHorizon
+    from metroflow.models.trees import XGBPerHorizon
     F, Y, M = _toy()
     m = XGBPerHorizon(stride=1, n_estimators=40).fit((F, Y, M), (F, Y, M), log=lambda *_: None)
     P = m.predict(F)
@@ -135,7 +135,7 @@ def test_xgb_per_horizon_learns_and_ignores_masked_targets():
 
 
 def test_random_forest_drops_masked_training_rows_only():
-    from src.models.trees import RandomForestMulti
+    from metroflow.models.trees import RandomForestMulti
     F, Y, M = _toy()
     m = RandomForestMulti(stride=1, n_estimators=8, max_depth=8, max_samples=0.5).fit((F, Y, M))
     assert m.n_train_rows == int(M.all(axis=1).sum())            # rows with any masked target are dropped...
@@ -143,7 +143,7 @@ def test_random_forest_drops_masked_training_rows_only():
 
 
 def test_period_labels_use_predicted_timestamp_and_brief_windows():
-    from src.eval.evaluate import period_labels
+    from metroflow.eval.evaluate import period_labels
     peaks = {"am": ["07:00", "09:59"], "pm": ["16:00", "19:59"]}
     tt = np.array([["2012-06-06T06:55", "2012-06-06T07:00", "2012-06-06T09:55", "2012-06-06T10:00"],     # Wednesday
                    ["2012-06-06T19:55", "2012-06-06T20:00", "2012-06-09T08:00", "2012-06-10T17:00"]],    # Wed, Sat, Sun
@@ -156,7 +156,7 @@ def test_period_labels_use_predicted_timestamp_and_brief_windows():
 
 
 def test_within_tolerance_counts_only_real_readings():
-    from src.eval.accuracy import within_tolerance
+    from metroflow.eval.accuracy import within_tolerance
     y = np.array([60.0, 60.0, 60.0, 60.0])
     p = np.array([62.0, 66.0, 55.0, 0.0])
     m = np.array([True, True, True, False])            # the last point is an outage and must not count

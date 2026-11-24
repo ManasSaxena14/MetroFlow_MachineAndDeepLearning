@@ -1,4 +1,4 @@
-# Full environment for the data, modelling, analysis and report pipeline (Python 3.11).
+# Full environment for data, modelling and evaluation (Python 3.11 or newer).
 -r requirements.txt
 folium==0.20.0
 gdown>=5.2
@@ -9,7 +9,6 @@ matplotlib==3.11.2
 nbconvert==7.17.1
 networkx==3.6.1
 pytest==9.1.1
-python-pptx==1.0.2
 pyyaml==6.0.3
 ruff==0.16.10
 scikit-learn==1.9.1

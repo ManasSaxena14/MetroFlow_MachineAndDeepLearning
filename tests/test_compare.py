@@ -1,7 +1,7 @@
-"""Phase 6 checks: day-level error aggregation and the significance tests behave as they should."""
+"""Comparison checks: day-level error aggregation and the significance tests behave as they should."""
 import numpy as np
 
-from src.eval import compare
+from metroflow.eval import compare
 
 
 def test_daily_errors_sum_by_target_day_and_ignore_masked():

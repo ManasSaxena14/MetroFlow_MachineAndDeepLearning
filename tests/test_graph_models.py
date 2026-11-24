@@ -1,13 +1,13 @@
-"""Phase 5 checks: the attention layer matches PyTorch Geometric, graph variants and diffusion directions are right,
+"""Graph-model checks: the attention layer matches PyTorch Geometric, graph variants and diffusion directions are right,
 and information flows between sensors only along the edges a model is given."""
 import numpy as np
 import pytest
 import torch
 
-from src.features.build import flatten_targets
-from src.models.graph_layers import GATv2Layer, diffusion_supports, road_graph, scatter_softmax
-from src.models.graph_models import DCRNN, STGAT
-from src.train.graph import RunConfig, predict_rows
+from metroflow.features.build import flatten_targets
+from metroflow.models.graph_layers import GATv2Layer, diffusion_supports, road_graph, scatter_softmax
+from metroflow.models.graph_models import DCRNN, STGAT
+from metroflow.train.graph import RunConfig, predict_rows
 
 # toy road 0 -> 1 -> 2 (adj[i, j] > 0: j is DOWNSTREAM of i); sensor 3 isolated; self-loops on the diagonal
 ADJ = np.eye(4, dtype=np.float32)

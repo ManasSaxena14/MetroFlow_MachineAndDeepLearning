@@ -1,8 +1,8 @@
 """Hybrid checks: chronological fitting split, blend weights, and the residual corrector's layout."""
 import numpy as np
 
-from src.features.build import FEATURE_NAMES
-from src.models import hybrid
+from metroflow.features.build import FEATURE_NAMES
+from metroflow.models import hybrid
 
 
 def test_chrono_split_is_chronological_and_by_whole_windows():

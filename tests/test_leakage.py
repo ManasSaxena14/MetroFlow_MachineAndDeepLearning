@@ -1,10 +1,10 @@
-"""Phase 2 gate: nothing the model is scored on may influence anything it is trained on."""
+"""Leakage gate: nothing the model is scored on may influence anything it is trained on."""
 import numpy as np
 import pytest
 
-from src.data import preprocess as pp
-from src.data.load import load_all, load_distances
-from src.eval.metrics import masked_mae, masked_mape, masked_rmse
+from metroflow.data import preprocess as pp
+from metroflow.data.load import load_all, load_distances
+from metroflow.eval.metrics import masked_mae, masked_mape, masked_rmse
 
 SUBSET = 3000   # ~10 days: enough for all three blocks, small enough to build in seconds
 

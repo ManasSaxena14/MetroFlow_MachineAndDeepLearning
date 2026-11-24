@@ -1,10 +1,10 @@
-"""Phase 1 data checks. These guard the assumptions every later phase relies on."""
+"""Data checks: the assumptions everything else relies on."""
 import numpy as np
 import pandas as pd
 import pytest
 
-from src.analysis import eda
-from src.data.load import load_all, load_distances
+from metroflow.analysis import eda
+from metroflow.data.load import load_all, load_distances
 
 
 @pytest.fixture(scope="module")

@@ -1,7 +1,7 @@
-"""Phase 4 checks: neighbour direction, neighbour features, onset labelling and residual correlation."""
+"""Gap checks: neighbour direction, neighbour features, onset labelling and residual correlation."""
 import numpy as np
 
-from src.analysis import gap
+from metroflow.analysis import gap
 
 # toy road: 0 -> 1 -> 2 (adj[i, j] > 0 means j is DOWNSTREAM of i); sensor 3 is isolated
 ADJ = np.eye(4, dtype=np.float32)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download METR-LA (+ PEMS-BAY for the Phase 9 extension) and the sensor graph into data/raw/.
+# Download METR-LA and the sensor graph into data/raw/.
 # Source: https://github.com/liyaguang/DCRNN#data-preparation
 set -euo pipefail
 cd "$(dirname "$0")/.."

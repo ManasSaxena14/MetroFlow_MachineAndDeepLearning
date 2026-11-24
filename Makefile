@@ -1,71 +1,67 @@
 PY := .venv/bin/python
 
-.PHONY: setup data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper dl-report report dashboard test lint all
+.PHONY: help setup data eda preprocess features baselines gap accuracy graph hybrid ablations compare maps operations dashboard test lint all
 
-setup:            ## create the environment (Python 3.11 via uv) and install pinned requirements
+help:             ## list the commands
+	@grep -E '^[a-z-]+: .*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-12s %s\n", $$1, $$2}'
+
+setup:            ## create .venv (Python 3.11 via uv) and install the pipeline requirements
 	uv venv --python 3.11 .venv && uv pip install --python $(PY) -r requirements-pipeline.txt
-	@echo "macOS: XGBoost also needs 'brew install libomp'; the report needs 'brew install tectonic'"
+	@echo "macOS: XGBoost also needs 'brew install libomp'"
 
 data:             ## download METR-LA and the sensor graph into data/raw
 	./scripts/download_data.sh
 
-eda:              ## execute the EDA notebook: figures 1-5 and results/phase1_findings.json
-	cd notebooks && ../.venv/bin/jupyter nbconvert --to notebook --execute --inplace 01_eda.ipynb
+eda:              ## run the exploratory notebook -> results/findings/exploration.json
+	cd notebooks && ../.venv/bin/jupyter nbconvert --to notebook --execute --inplace 01_exploratory_analysis.ipynb
 
 preprocess:       ## leak-free windows -> data/processed/<protocol>/
-	$(PY) -m src.data.preprocess
+	$(PY) -m metroflow.data.preprocess
 
-features:         ## per-sensor feature tables (memory-mapped .npy)
-	$(PY) -m src.features.build
+features:         ## per-sensor feature tables
+	$(PY) -m metroflow.features.build
 
-baselines:        ## six baselines -> results/baselines*.csv and figures 6-7
-	$(PY) -m src.train.baselines persistence hist_avg ridge xgb rf lstm --peak
-	$(PY) -m src.viz.baseline_plots
+baselines:        ## six per-sensor baselines -> results/baselines/
+	$(PY) -m metroflow.train.baselines persistence hist_avg ridge xgb rf lstm --peak
+	$(PY) -m metroflow.viz.baseline_plots
 
-gap:              ## gap experiments -> results/gap_results.csv, results/gap/ and figures 8-11
-	$(PY) -m src.train.phase4 neighbours onset residuals table
-	$(PY) -m src.viz.gap_plots
+gap:              ## gap experiments -> results/gap/
+	$(PY) -m metroflow.train.gap neighbours onset residuals table
+	$(PY) -m metroflow.viz.gap_plots
 
-accuracy:         ## percent accuracy and within-5-mph scores -> results/accuracy.csv
-	$(PY) -m src.eval.accuracy
+accuracy:         ## plain-language accuracy scores -> results/baselines/accuracy.csv
+	$(PY) -m metroflow.eval.accuracy
 
-graph:            ## Phase 5: STGAT and DCRNN (3 seeds), ablations, reference-protocol DCRNN (~10 h on an M3 Pro; resumable)
-	./scripts/run_phase5.sh all
+graph:            ## STGAT and DCRNN, 3 seeds, ablations (about 10 h on an M3 Pro, resumable)
+	./scripts/train_graph_models.sh all
 
-hybrid:           ## Phase 5 hybrid: DCRNN + regularised XGBoost residual corrector (and blend / full ablations)
-	$(PY) -m src.train.hybrid
+hybrid:           ## DCRNN + XGBoost residual corrector and its variants -> results/hybrid/
+	$(PY) -m metroflow.train.hybrid
 
-phase5:           ## Phase 5 analysis: ablation table, learning curves, attention inspection -> results/, figures 12-14
-	$(PY) -m src.eval.phase5
+ablations:        ## ablation table, learning curves, attention inspection -> results/comparison/
+	$(PY) -m metroflow.eval.ablations
 
-compare:          ## Phase 6: final fair comparison, significance tests, gain breakdown -> results/final*.csv, figures 15-17
-	$(PY) -m src.eval.compare
+compare:          ## final comparison and day-level significance tests -> results/comparison/
+	$(PY) -m metroflow.eval.compare
 
-maps:             ## Phase 7: congestion maps, error map, time-space diagram, animated HTML -> figures 18-21
-	$(PY) -m src.viz.maps
+maps:             ## congestion maps and time-space diagram -> outputs/figures/
+	$(PY) -m metroflow.viz.maps
 
-slides:           ## regenerate the DL-part slide deck from results/ (docs/presentation/DL_Graph_Models.pptx)
-	$(PY) scripts/make_dl_slides.py
+operations:       ## alerts, forecast ranges, failure tests and the dashboard replay
+	$(PY) -m metroflow.train.hybrid_cv
+	$(PY) -m metroflow.eval.uncertainty
+	$(PY) -m metroflow.eval.alerts
+	$(PY) -m metroflow.eval.replay
+	$(PY) -m metroflow.eval.robustness --stage graph
+	$(PY) -m metroflow.eval.robustness --stage trees
 
-paper:            ## IEEE-format research paper from results/ -> docs/paper/paper.pdf (brew install tectonic)
-	$(PY) scripts/make_paper_tables.py
-	cd docs/paper && tectonic paper.tex
-
-dl-report:        ## DL-phase project report from results/ -> docs/dl_report/dl_report.pdf (brew install tectonic)
-	$(PY) scripts/make_dl_report_tables.py
-	cd docs/dl_report && tectonic dl_report.tex
-
-report:           ## regenerate the report tables from results/ and compile docs/report/report.pdf
-	$(PY) scripts/make_report_tables.py
-	cd docs/report && tectonic report.tex
-
-dashboard:        ## interactive Streamlit dashboard over results/ (app.py)
+dashboard:        ## open the dashboard locally
 	$(PY) -m streamlit run app.py
 
 test:             ## run the automated tests
 	$(PY) -m pytest -q
 
 lint:             ## static checks
-	.venv/bin/ruff check src tests scripts app.py
+	.venv/bin/ruff check .
 
-all: data eda preprocess features baselines gap accuracy graph hybrid phase5 compare maps slides paper dl-report report test lint
+all: data eda preprocess features baselines gap accuracy graph hybrid ablations compare maps operations test lint
