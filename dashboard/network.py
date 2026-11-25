@@ -95,7 +95,7 @@ def day_line(r, ff: np.ndarray, t: int) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x, y=cong, mode="lines", line=dict(color=T.INK, width=2), name="Measured", text=[clock(k) for k in x],
                              hovertemplate="%{text}: %{y:.0f} congested<extra></extra>"))
-    fig.add_trace(go.Scatter(x=x, y=said, mode="lines", line=dict(color=T.MODEL["Hybrid"], width=2), name="Forecast made 30 min earlier",
+    fig.add_trace(go.Scatter(x=x, y=said, mode="lines", line=dict(color=T.MODEL["Hybrid"], width=2), name="Forecast, 30 min before",
                              text=[clock(k) for k in x], hovertemplate="%{text}: %{y:.0f} forecast<extra></extra>"))
     fig.add_vline(x=t, line=dict(color=T.STATE["congested"], width=1.6))
     T.style(fig, 230, y="congested sensors", hovermode="x unified")

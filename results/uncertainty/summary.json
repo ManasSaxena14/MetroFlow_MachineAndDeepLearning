@@ -1,0 +1,12 @@
+{
+  "seed": 0,
+  "calibration_targets": 7895428,
+  "calibration_days": 12,
+  "folds": 4,
+  "groups": "horizon x predicted state x disagreement third",
+  "coverage_80_adaptive": {
+    "15": 79.58,
+    "30": 79.77,
+    "60": 80.11
+  }
+}

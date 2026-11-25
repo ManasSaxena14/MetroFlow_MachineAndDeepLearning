@@ -126,7 +126,7 @@ def test_rebuilt_adjacency_equals_pickle(cfg, data):
     assert not np.allclose(rebuilt, rebuilt.T)         # still directed
 
 
-def test_shapes_and_cyclic_features(small, cfg):
+def test_shapes_and_cyclic_features(small):
     _, ds = small
     for s in ds["splits"].values():
         S = len(s["origin_idx"])

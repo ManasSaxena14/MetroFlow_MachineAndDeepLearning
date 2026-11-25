@@ -8,9 +8,9 @@ import streamlit as st
 from dashboard import data as D
 from dashboard import theme as T
 
-MAIN = "Hybrid, calibrated probability"
-ORDER = [MAIN, "Hybrid", "DCRNN", "XGBoost", "Trend rule (no model)", "Calendar (historical average)"]
-LOOK = {MAIN: (T.MODEL["Hybrid"], "solid"), "Hybrid": (T.MODEL["Hybrid"], "dash"), "DCRNN": (T.MODEL["DCRNN"], "solid"),
+PROB = "Hybrid, calibrated probability"
+ORDER = ["Hybrid", PROB, "DCRNN", "XGBoost", "Calendar (historical average)", "Trend rule (no model)"]
+LOOK = {"Hybrid": (T.MODEL["Hybrid"], "solid"), PROB: (T.MODEL["Hybrid"], "dash"), "DCRNN": (T.MODEL["DCRNN"], "solid"),
         "XGBoost": (T.MODEL["XGBoost"], "solid"), "Trend rule (no model)": (T.GREYS["LSTM"], "dot"), "Calendar (historical average)": (T.QUIET, "dot")}
 
 
@@ -20,12 +20,13 @@ def page() -> None:
     st.title("How many jams would operators be warned about?")
     if not D.need(ops, curve, leads, daily, per, command="make operations"):
         return
+    MAIN = info["main_model"]
     a, b, _ = st.columns([1.2, 2.2, 0.2], vertical_alignment="bottom", gap="large")
-    budget = a.select_slider("False alarms allowed per day, whole network", sorted(ops.budget_per_day.unique()), value=50)
+    budget = a.select_slider("False alarms allowed per day, whole network", sorted(ops.budget_per_day.unique()), value=info["headline_budget"])
     lead = b.segmented_control("Warned at least this far ahead", [5, 10, 15, 20, 30], default=10, key="lead", required=True, format_func=lambda m: f"{m} min")
     o = ops[ops.budget_per_day == budget].set_index("model").loc[ORDER]
     best = o.loc[MAIN]
-    T.lede(f"With a threshold set for {budget} false alarms a day on validation data, the hybrid warned of <b>{best[f'recall_{lead}min_pct']:.0f}%</b> of "
+    T.lede(f"With a threshold set for {budget} false alarms a day on validation data, the hybrid forecast warned of <b>{best[f'recall_{lead}min_pct']:.0f}%</b> of "
            f"the {int(best.jams):,} test jams at least {lead} minutes ahead. It raised <b>{best.false_alarms_per_day:.0f}</b> false alarms a day across 207 sensors, "
            f"and <b>{best.precision_pct:.0f}%</b> of its alerts were followed by a jam within the hour.")
 
@@ -37,6 +38,9 @@ def page() -> None:
                       lo=list(o.recall_lo) if ci else None, hi=list(o.recall_hi) if ci else None), "recall")
         T.note("Every model uses its own threshold, set to the same false-alarm budget on validation. " +
                ("Whiskers are 95% intervals from resampling whole test days." if ci else "Day-level intervals are shown for the 10-minute view."))
+        if o.loc[PROB, f"recall_{lead}min_pct"] < best[f"recall_{lead}min_pct"]:
+            T.note(f"The calibrated probability is the weaker alert here. It fires later: its median first warning is {o.loc[PROB].median_lead_min:.0f} minutes, against "
+                   f"{best.median_lead_min:.0f} for the {MAIN.lower()} forecast. The main alert was picked by validation recall, not by test results.")
     with right:
         st.subheader("The trade-off on the test days")
         fig = go.Figure()
@@ -60,7 +64,7 @@ def page() -> None:
         fig = go.Figure(go.Bar(x=x, y=100 * d / d.sum(), marker=dict(color=[T.QUIET_2 if k == 0 else T.MODEL["Hybrid"] for k in d.index], cornerradius=3),
                                hovertemplate="%{x}: %{y:.1f}% of jams<extra></extra>"))
         T.show(T.style(fig, 320, y="share of jams (%)", legend=False), "leads")
-        T.note("Measured at 50 false alarms a day, from the first alert in the hour before each jam.")
+        T.note(f"Measured at {info['headline_budget']} false alarms a day, from the first alert in the hour before each jam.")
     with right:
         st.subheader("Day by day")
         d = daily[daily.model == MAIN].copy()
@@ -71,7 +75,7 @@ def page() -> None:
         T.style(fig, 320, y="jams warned about (%)", legend=False)
         fig.update_xaxes(tickformat="%d %b")
         T.show(fig, "daily")
-        T.note("At least 10 minutes ahead, at 50 false alarms a day. Weekends are grey.")
+        T.note(f"At least 10 minutes ahead, at {info['headline_budget']} false alarms a day. Weekends are grey.")
 
     st.subheader("All models at this setting")
     t = o.reset_index()[["model", "precision_pct", "false_alarms_per_day", *[f"recall_{k}min_pct" for k in (5, 10, 20, 30)], "median_lead_min"]]
@@ -80,7 +84,7 @@ def page() -> None:
         "model": "Model", "precision_pct": pct("Alerts that were right", format="%.0f%%"), "false_alarms_per_day": pct("False alarms a day", format="%.0f"),
         **{f"recall_{k}min_pct": pct(f"Warned {k}+ min", format="%.0f%%") for k in (5, 10, 20, 30)}, "median_lead_min": pct("Median warning", format="%.0f min")})
     p = per[per.model == MAIN].set_index("period")
-    st.markdown(f"At 50 false alarms a day the hybrid warned of {p.recall_10min_pct['peak']:.0f}% of weekday-peak jams 10 minutes ahead, "
+    st.markdown(f"At {info['headline_budget']} false alarms a day the hybrid warned of {p.recall_10min_pct['peak']:.0f}% of weekday-peak jams 10 minutes ahead, "
                 f"{p.recall_10min_pct['offpeak']:.0f}% of weekday off-peak jams and {p.recall_10min_pct['weekend']:.0f}% of weekend jams.")
     with st.expander("Definitions"):
         st.markdown(f"""

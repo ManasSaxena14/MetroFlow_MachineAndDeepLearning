@@ -57,4 +57,15 @@ def page() -> None:
 - **Warnings come from downstream.** Among links with a clear lead, the downstream detector moved first on {pr['downstream_first']} and the upstream one on {pr['upstream_first']}.
 - **Trees and graphs are complementary.** A small tree model that corrects DCRNN lowers its 60-minute error by {100 * (1 - h.MAE_60min / d.MAE_60min):.1f}%.
 """)
+    ops, al, cov, rb = D.csv("alerts/operating_points.csv"), D.js("alerts/summary.json"), D.csv("uncertainty/coverage.csv"), D.csv("robustness/summary.csv")
+    if len(ops) and len(cov) and len(rb):
+        a = ops[(ops.model == al["main_model"]) & (ops.budget_per_day == al["headline_budget"])].iloc[0]
+        c = cov[(cov.method == "adaptive") & (cov.target_pct == 80) & (cov.minutes == 30)].iloc[0]
+        k = rb[(rb.kind == "stuck") & (rb.level == 30) & (rb.minutes == 30)].set_index("model")
+        st.subheader("What it means for an operator")
+        st.markdown(f"""
+- **Alerts:** {a.recall_10min_pct:.0f}% of jams warned about at least ten minutes ahead, at {a.false_alarms_per_day:.0f} false alarms a day over 207 detectors. Most jams still go unwarned.
+- **Confidence:** the 80% range holds the true speed {c.coverage_pct:.0f}% of the time, 30 minutes ahead, but much less often just after a jam starts.
+- **Failures:** if 30% of detectors silently stick at free flow, the hybrid's error rises {k.increase_pct['Hybrid']:.0f}%, more than XGBoost's {k.increase_pct['XGBoost']:.0f}%.
+""")
     st.markdown(f"Code, data pipeline, reports and slides: [GitHub repository]({REPO}). Data: METR-LA, March to June 2012. Nothing here is a live feed or controls traffic.")

@@ -1,0 +1,18 @@
+{
+  "seed": 0,
+  "test_days": 23.760416666666668,
+  "val_days": 11.864583333333334,
+  "test_jams": 2624,
+  "val_jams": 1110,
+  "sensors": 207,
+  "budgets": [
+    25,
+    50,
+    100,
+    200
+  ],
+  "main_model": "Hybrid",
+  "headline_budget": 50,
+  "jam": "3 readings below 50% of free flow after 30 clear minutes",
+  "quiet_min": 60
+}

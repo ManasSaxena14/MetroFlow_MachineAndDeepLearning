@@ -1,0 +1,19 @@
+model,period,jams,recall_10min_pct,precision_pct
+Calendar (historical average),peak,1221,30.139,25.119
+Calendar (historical average),offpeak,1120,19.375,58.219
+Calendar (historical average),weekend,283,6.7138,21.978
+Trend rule (no model),peak,1221,9.5004,30.863
+Trend rule (no model),offpeak,1120,7.1429,30.742
+Trend rule (no model),weekend,283,9.5406,27.458
+XGBoost,peak,1221,24.98,28.866
+XGBoost,offpeak,1120,19.375,47.065
+XGBoost,weekend,283,4.2403,23.932
+DCRNN,peak,1221,37.183,37.765
+DCRNN,offpeak,1120,35,52.858
+DCRNN,weekend,283,13.781,34.591
+Hybrid,peak,1221,40.295,36.782
+Hybrid,offpeak,1120,35.714,54.067
+Hybrid,weekend,283,9.1873,37.037
+"Hybrid, calibrated probability",peak,1221,29.566,35.52
+"Hybrid, calibrated probability",offpeak,1120,28.929,53.922
+"Hybrid, calibrated probability",weekend,283,8.4806,31.288

@@ -1,0 +1,79 @@
+model,lead_min,jams
+Calendar (historical average),0,1967
+Calendar (historical average),5,53
+Calendar (historical average),10,40
+Calendar (historical average),15,43
+Calendar (historical average),20,45
+Calendar (historical average),25,34
+Calendar (historical average),30,43
+Calendar (historical average),35,55
+Calendar (historical average),40,42
+Calendar (historical average),45,73
+Calendar (historical average),50,88
+Calendar (historical average),55,92
+Calendar (historical average),60,49
+Trend rule (no model),0,2055
+Trend rule (no model),5,346
+Trend rule (no model),10,74
+Trend rule (no model),15,32
+Trend rule (no model),20,23
+Trend rule (no model),25,16
+Trend rule (no model),30,8
+Trend rule (no model),35,7
+Trend rule (no model),40,15
+Trend rule (no model),45,13
+Trend rule (no model),50,8
+Trend rule (no model),55,15
+Trend rule (no model),60,12
+XGBoost,0,1884
+XGBoost,5,206
+XGBoost,10,78
+XGBoost,15,40
+XGBoost,20,33
+XGBoost,25,34
+XGBoost,30,52
+XGBoost,35,41
+XGBoost,40,49
+XGBoost,45,49
+XGBoost,50,65
+XGBoost,55,56
+XGBoost,60,37
+DCRNN,0,1573
+DCRNN,5,166
+DCRNN,10,116
+DCRNN,15,108
+DCRNN,20,88
+DCRNN,25,65
+DCRNN,30,74
+DCRNN,35,84
+DCRNN,40,93
+DCRNN,45,79
+DCRNN,50,83
+DCRNN,55,49
+DCRNN,60,46
+Hybrid,0,1509
+Hybrid,5,197
+Hybrid,10,138
+Hybrid,15,116
+Hybrid,20,58
+Hybrid,25,64
+Hybrid,30,77
+Hybrid,35,87
+Hybrid,40,68
+Hybrid,45,80
+Hybrid,50,112
+Hybrid,55,71
+Hybrid,60,47
+"Hybrid, calibrated probability",0,1599
+"Hybrid, calibrated probability",5,316
+"Hybrid, calibrated probability",10,197
+"Hybrid, calibrated probability",15,115
+"Hybrid, calibrated probability",20,74
+"Hybrid, calibrated probability",25,71
+"Hybrid, calibrated probability",30,55
+"Hybrid, calibrated probability",35,37
+"Hybrid, calibrated probability",40,32
+"Hybrid, calibrated probability",45,36
+"Hybrid, calibrated probability",50,36
+"Hybrid, calibrated probability",55,28
+"Hybrid, calibrated probability",60,28

@@ -1,0 +1,18 @@
+{
+  "cover": 0.8,
+  "alert_model": "Hybrid",
+  "budget_per_day": 50,
+  "threshold": -0.36324,
+  "days": {
+    "busiest": {
+      "date": "2012-06-08",
+      "jams": 158,
+      "alerts": 134
+    },
+    "typical": {
+      "date": "2012-06-07",
+      "jams": 129,
+      "alerts": 129
+    }
+  }
+}

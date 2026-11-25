@@ -24,7 +24,6 @@ from metroflow.train.baselines import ROOT
 
 OUT = ROOT / "results" / "replay"
 COVER = 0.8
-ALERT_MODEL = "Hybrid, calibrated probability"
 EXAMPLE = ("717462", "717472", "2012-05-02 05:40", "2012-05-02 08:10")          # downstream, upstream, from, to (figure 5d)
 
 
@@ -49,7 +48,7 @@ def export_example(speed: pd.DataFrame) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--budget", type=int, default=50)
+    ap.add_argument("--budget", type=int, default=al.HEADLINE_BUDGET)
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     data, ff, speed = unc.load_val_test(args.seed), unc.free_flow(), load_speed()
@@ -58,14 +57,18 @@ def main() -> None:
     starts, conf, d = al.jam_starts(v, ff), unc.calibrate(data["val"]), data["test"]
     org = load_split("test", keys=["origin_idx"])["origin_idx"]
     ops = pd.read_csv(ROOT / "results" / "alerts" / "operating_points.csv")
-    thr = float(ops[(ops.model == ALERT_MODEL) & (ops.budget_per_day == args.budget)].threshold.iloc[0])
-    score, now = al.probability_score(conf, d), v[org]
+    model = json.loads((ROOT / "results" / "alerts" / "summary.json").read_text())["main_model"]
+    thr = float(ops[(ops.model == model) & (ops.budget_per_day == args.budget)].threshold.iloc[0])
+    chance, now = al.probability_score(conf, d), v[org]
+    score = {"Hybrid, calibrated probability": chance, "Hybrid": al.forecast_score(d["f"], ff)}.get(model)
+    if score is None:
+        raise ValueError(f"no replay score for {model!r}")
     fired = al.raise_alerts(score, ~np.isnan(now) & (now >= unc.CONGESTED * ff), thr)
 
     first = speed.index[org[0]].normalize() + pd.Timedelta(days=1)                # whole days only
     last = speed.index[org[-1]].normalize() - pd.Timedelta(days=1)
     days = pick_days(starts, speed.index, first, last)
-    info = {"cover": COVER, "alert_model": ALERT_MODEL, "budget_per_day": args.budget, "threshold": thr, "days": {}}
+    info = {"cover": COVER, "alert_model": model, "budget_per_day": args.budget, "threshold": thr, "days": {}}
     for name, day in days.items():
         t = int(speed.index.get_loc(day))
         s = int(t - org[0])                                                       # first origin of the day
@@ -75,7 +78,7 @@ def main() -> None:
             a, b = conf.interval(d["f"][rows, h], d["gap"][rows, h], d["ff"][rows], h, COVER)
             f[:, h], lo[:, h], hi[:, h] = (x.reshape(288, al.N) for x in (d["f"][rows, h], a, b))
         np.savez_compressed(OUT / f"{name}.npz", actual=pack(v[t - 12:t + 288 + 12]), forecast=pack(f), lo=pack(lo), hi=pack(hi),
-                            prob=np.round(score[s:s + 288] * 100).astype(np.uint8), alert=fired[s:s + 288], jam=starts[t:t + 288])
+                            prob=np.round(chance[s:s + 288] * 100).astype(np.uint8), alert=fired[s:s + 288], jam=starts[t:t + 288])
         info["days"][name] = {"date": str(day.date()), "jams": int(starts[t:t + 288].sum()), "alerts": int(fired[s:s + 288].sum())}
     g = load_adjacency()
     ids = [str(x) for x in g["sensor_ids"]]

@@ -76,7 +76,7 @@ def test_persistence_repeats_last_value(built):
     assert P.shape == (len(F), 12) and (P == F[:, [0]]).all()
 
 
-def test_historical_average_is_train_only_and_shaped(speed, cfg, built):
+def test_historical_average_is_train_only_and_shaped(speed, built):
     ds, s, *_ = built
     end = ds["train_end"]
     m = simple.HistoricalAverage().fit(speed, end)

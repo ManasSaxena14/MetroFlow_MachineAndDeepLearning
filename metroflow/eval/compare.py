@@ -261,7 +261,7 @@ def main() -> None:
     print(json.dumps(findings, indent=2, default=float))
 
     from metroflow.viz import compare_plots
-    compare_plots.make_all(final, long, deg, ons, sig)
+    compare_plots.make_all(final, long, deg, ons)
 
 
 if __name__ == "__main__":

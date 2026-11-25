@@ -14,7 +14,8 @@ Scores       forecasts: the lowest forecast speed over the next 60 minutes as a 
              trend rule: the last 15-minute change extrapolated, no model;  calendar: the historical average.
 
 Every threshold is chosen on the validation block (out-of-fold forecasts for the hybrid), at a fixed budget of false alarms
-per day over the whole network. The test block only reports what those thresholds deliver.
+per day over the whole network. The main score is the one with the best validation recall at the headline budget. The test
+block only reports what those choices deliver.
 
 Writes results/alerts/{operating_points,curve,daily,lead_times,by_period}.csv and summary.json
 """
@@ -39,6 +40,7 @@ N = 207
 HORIZON = 12
 RUN, CLEAR, MIN_REAL, QUIET = 3, 6, 4, 12
 BUDGETS = (25, 50, 100, 200)                     # false alarms per day over all 207 sensors
+HEADLINE_BUDGET = 50
 LEADS = (5, 10, 15, 20, 30)
 
 
@@ -113,6 +115,12 @@ def forecast_score(P: np.ndarray, ff: np.ndarray) -> np.ndarray:
     return -(to_windows(P).min(-1) / ff)
 
 
+def main_model(points: pd.DataFrame) -> str:
+    """The score with the best VALIDATION recall (10+ minutes ahead) at the headline budget."""
+    p = points[points.budget_per_day == HEADLINE_BUDGET]
+    return str(p.loc[p.val_recall_10min_pct.idxmax(), "model"])
+
+
 def probability_score(conf: unc.GroupedConformal, d: dict) -> np.ndarray:
     p = np.stack([conf.prob_below(d["f"][:, h], d["gap"][:, h], d["ff"], h) for h in range(HORIZON)], axis=1)
     return p.reshape(-1, N, HORIZON).max(-1)
@@ -125,7 +133,7 @@ def trend_score(v: np.ndarray, origins: np.ndarray, ff: np.ndarray) -> np.ndarra
     return np.where(np.isnan(s), -np.inf, s)
 
 
-def prepare(split: str, data: dict, v: np.ndarray, starts: np.ndarray, ff: np.ndarray, conf, seed: int) -> dict:
+def prepare(split: str, data: dict, v: np.ndarray, starts: np.ndarray, ff: np.ndarray, conf) -> dict:
     o = load_split(split, keys=["origin_idx", "target_time"])
     org = o["origin_idx"]
     assert (np.diff(org) == 1).all(), "alert scoring needs contiguous origins"
@@ -161,7 +169,7 @@ def main() -> None:
     data, ff, speed = unc.load_val_test(seed), unc.free_flow(), load_speed()
     v = np.where(speed.values > 0, speed.values, np.nan).astype(np.float32)
     starts, conf = jam_starts(v, ff), unc.calibrate(data["val"])
-    val, test = (prepare(s, data, v, starts, ff, conf, seed) for s in ("val", "test"))
+    val, test = (prepare(s, data, v, starts, ff, conf) for s in ("val", "test"))
     org_days = speed.index[test["origins"]].normalize().to_numpy()
     rng = np.random.default_rng(0)
 
@@ -177,7 +185,7 @@ def main() -> None:
             points.append({"model": name, "budget_per_day": budget, "threshold": thr, **metrics(m, test["days"]),
                            **bootstrap_days(m, org_days, jam_days, rng),
                            "val_recall_10min_pct": mv["recall_10min_pct"], "val_false_alarms_per_day": mv["false_alarms_per_day"]})
-            if budget == 50:
+            if budget == HEADLINE_BUDGET:
                 for d in np.unique(org_days):
                     sel = jam_days == d
                     daily.append({"model": name, "day": str(pd.Timestamp(d).date()), "jams": int(sel.sum()),
@@ -197,9 +205,11 @@ def main() -> None:
         print(pd.DataFrame(points[-len(BUDGETS):]).drop(columns=["threshold"]).round(1).to_string(index=False), flush=True)
     for nm, rows in (("operating_points", points), ("curve", curve), ("daily", daily), ("lead_times", leads), ("by_period", period)):
         pd.DataFrame(rows).to_csv(OUT / f"{nm}.csv", index=False, float_format="%.5g")
+    main = main_model(pd.DataFrame(points))
     (OUT / "summary.json").write_text(json.dumps({
         "seed": seed, "test_days": test["days"], "val_days": val["days"], "test_jams": int(points[0]["jams"]),
-        "val_jams": int(val["starts"][HORIZON:len(val["origins"])].sum()), "sensors": N, "budgets": BUDGETS,
+        "val_jams": int(val["starts"][HORIZON:len(val["origins"])].sum()), "sensors": N, "budgets": BUDGETS, 
+        "main_model": main, "headline_budget": HEADLINE_BUDGET,
         "jam": "3 readings below 50% of free flow after 30 clear minutes", "quiet_min": 5 * QUIET}, indent=2))
 
 

@@ -8,7 +8,7 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-4a90e8)
 ![PyTorch](https://img.shields.io/badge/PyTorch-graph%20models-e0702f)
 ![XGBoost](https://img.shields.io/badge/XGBoost-baselines%20and%20hybrid-e0702f)
-![Tests](https://img.shields.io/badge/tests-68-1fae7e)
+![Tests](https://img.shields.io/badge/tests-69-1fae7e)
 ![Data](https://img.shields.io/badge/data-METR--LA-8b9294)
 
 [Live dashboard](https://trafficflowamldl.streamlit.app) ·
@@ -59,6 +59,8 @@ detector's history cannot see it coming.*
   gain. Hearing downstream neighbours matters more than hearing upstream ones.
 - **The attention is interpretable.** STGAT, our graph attention network, moves attention downstream (52% to 62%) when a
   slowdown is 30 minutes away, for 149 of 163 detectors.
+- **Alerts and ranges are honest.** At about 56 false alarms a day over 207 detectors the hybrid warns of 35% of jams ten minutes
+  ahead, and its 80% ranges hold 80% of the time on average, with their failures reported.
 - **The implementation is faithful.** Our DCRNN port reproduces the published METR-LA numbers to within 1.5%, and our
   attention layer is tested to equal PyTorch Geometric's `GATv2Conv`.
 
@@ -158,15 +160,57 @@ The 30-minute forecasts of XGBoost caught 75 of them and DCRNN 88.
 
 ## Operational evaluation
 
-`make operations` measures what an operator would ask of these forecasts. The code and its tests are in the repository, and
-the matching dashboard pages appear once the result files exist.
+What an operator would ask of these forecasts, measured with one retrained seed (seed 0). `make operations` reproduces it.
 
-| Question | Module | How it is measured |
-|---|---|---|
-| How many jams would operators be warned about, and how early? | `metroflow/eval/alerts.py` | Recall by lead time, precision and false alarms per day, with thresholds set on validation at a fixed false-alarm budget |
-| How sure is the forecast? | `metroflow/eval/uncertainty.py` | Conformal 80% and 90% ranges and jam probabilities, calibrated on out-of-fold validation errors |
-| What if detectors fail? | `metroflow/eval/robustness.py` | Detectors off, stuck at free flow, late feeds, noise and corrupted readings, without retraining |
-| What would it look like live? | `metroflow/eval/replay.py` | Two test days, picked by rule, exported for the dashboard's map |
+### Congestion alerts
+
+A jam is three readings in a row below half of a detector's free-flow speed, after 30 clear minutes. The test block holds
+2,624 of them over 24 days. Each model's alert threshold is set on validation days for 50 false alarms a day over all 207
+detectors. June was busier than the validation days, so the false alarms that followed are slightly higher.
+
+| Alert signal | False alarms a day | Alerts that were right | Jams warned 10+ min ahead | 20+ min ahead |
+|---|---:|---:|---:|---:|
+| **Hybrid forecast** | 56 | 46% | **35%** (95% interval 31 to 39%) | 25% |
+| Hybrid, calibrated probability | 56 | 43% | 27% | 15% |
+| DCRNN | 54 | 45% | 34% | 25% |
+| XGBoost | 52 | 38% | 20% | 16% |
+| Calendar (usual daily pattern) | 42 | 39% | 23% | 20% |
+| Trend rule (no model) | 55 | 30% | 8% | 4% |
+
+The hybrid warns about more jams than XGBoost at the same budget, and most jams still go unwarned. The main signal was chosen by
+validation recall. The calibrated probability, which we expected to win, is the weaker alert because it fires later.
+
+### Forecast ranges
+
+Conformal ranges, calibrated on out-of-fold validation errors. They hold their promise on average and widen when traffic is
+uncertain. They do not hold just after a jam starts, when errors are largest.
+
+| 80% range | 15 min | 30 min | 60 min |
+|---|---:|---:|---:|
+| Held the true speed | 79.6% | 79.8% | 80.1% |
+| One fixed width | 78.2% | 78.3% | 78.4% |
+| Interval score, adaptive / fixed (lower is better) | 15.1 / 17.1 | 17.9 / 20.5 | 21.0 / 24.5 |
+| Held, in the 30 minutes after a jam starts | 50% | 40% | 38% |
+
+Daily coverage ran from 77% to 86% at each horizon. Stated jam probabilities match observed frequencies closely (see the
+dashboard's Ranges page).
+
+### Failure tests
+
+Inputs are broken, nothing is retrained, targets stay real. Mean absolute error 30 minutes ahead:
+
+| Failure | Hybrid | DCRNN | STGAT | XGBoost | Repeat last reading |
+|---|---:|---:|---:|---:|---:|
+| None | 3.02 | 3.05 | 3.32 | 3.51 | 4.19 |
+| 30% of detectors off | 3.43 | 3.46 | 3.85 | 4.05 | 4.57 |
+| 30% stuck at free flow | 4.45 | 4.41 | 4.83 | 4.55 | 5.43 |
+| Feed 30 minutes late | 3.81 | 3.87 | 4.38 | 5.05 | 5.35 |
+| Noise, 10 mph | 4.28 | 4.50 | 6.00 | 5.58 | 9.63 |
+| 30% of readings corrupted | 4.89 | 5.02 | 5.61 | 6.98 | 10.98 |
+
+The hybrid degrades most when detectors silently stick: its error rises 48% at 30% stuck, against 30% for XGBoost, and
+DCRNN becomes slightly better than the hybrid. For delays, noise and corrupted readings its error rises less than XGBoost's.
+Detecting stuck detectors should come before relying on the forecasts.
 
 ## Getting started
 
@@ -229,19 +273,21 @@ committed.
 
 ## Testing and reproducibility
 
-- **68 automated tests** cover chronological order, no shared targets between blocks, train-only statistics, masked metrics,
+- **69 automated tests** cover chronological order, no shared targets between blocks, train-only statistics, masked metrics,
   sensor order, the attention layer against PyTorch Geometric, information flowing only along given edges, the hybrid's
   chronological fitting split, alert timing, range calibration and corrupted inputs. Tests that need METR-LA are skipped
   until `make data` has been run.
 - **Seeds.** Graph models and the hybrid use three seeds. The seed standard deviation of test MAE is at most 0.002 mph for
   STGAT and 0.010 mph for DCRNN.
 - **Reproduction.** Under the reference protocol our DCRNN reaches 2.63 / 3.03 / 3.54 mph, against the published 2.67 / 3.08 /
-  3.56. An independent retraining of XGBoost matched the stored scores exactly.
+  3.56. Independent retraining on another Mac matched the stored scores exactly for XGBoost, to three decimals for DCRNN (seed 0)
+  and within 0.004 mph for STGAT (seed 0).
 
 ## Limitations
 
 - METR-LA records speed only. The data are 2012 freeway readings from one city, and transfer is untested.
-- Baselines use one seed (42) and ablations use one. Graph models and the hybrid use three.
+- Baselines use one seed (42) and ablations use one. Graph models and the hybrid use three. The operational evaluation uses one
+  retrained seed, and the reports predate it.
 - The hybrid is fitted on the validation block, which the baselines used only for tuning.
 - Several boosted models stopped at their round limit rather than by early stopping: XGBoost (600 rounds) at every horizon
   from 20 minutes on, and the hybrid's corrector (1,500 rounds) in 35 of 36 fits. Longer training might lower both errors.

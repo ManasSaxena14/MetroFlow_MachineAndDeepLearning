@@ -1,5 +1,6 @@
 """Alerts, forecast ranges and failure testing: definitions, causality, calibration and layout."""
 import numpy as np
+import pandas as pd
 import pytest
 
 from metroflow.data import preprocess as pp
@@ -82,6 +83,12 @@ def test_threshold_keeps_the_false_alarm_budget():
     thr = alerts.threshold_for_budget(score, ok, st, real, days=2, budget=30)
     n_false = alerts.match(alerts.raise_alerts(score, ok, thr), st, real)["false"].sum() / 2
     assert 20 <= n_false <= 30
+
+
+def test_main_model_is_chosen_on_validation_only():
+    p = pd.DataFrame({"model": ["a", "b", "a"], "budget_per_day": [50, 50, 100], "val_recall_10min_pct": [30.0, 40.0, 99.0],
+                      "recall_10min_pct": [90.0, 10.0, 99.0]})                  # "a" wins on test, "b" on validation
+    assert alerts.main_model(p) == "b"
 
 
 # ----------------------------------------------------------------------------- uncertainty

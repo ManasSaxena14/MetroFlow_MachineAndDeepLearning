@@ -92,7 +92,7 @@ def plot_gain(deg: pd.DataFrame, ons: pd.DataFrame, graph: str, base: str = "XGB
     return fig
 
 
-def make_all(final, long, deg, ons, sig) -> None:
+def make_all(final, long, deg, ons) -> None:
     save(plot_horizon(long), "fig15_final_error_by_horizon.png")
     save(plot_periods(final), "fig16_final_peak_offpeak.png")
     graphs = [g for g in ("STGAT (ours)", "DCRNN") if g in set(final.model)]
