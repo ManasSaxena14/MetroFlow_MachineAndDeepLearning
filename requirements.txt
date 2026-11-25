@@ -1,6 +1,6 @@
-# Dashboard (app.py) -- this is the file Streamlit Community Cloud installs.
+# Dashboard (app.py): the file Streamlit Community Cloud installs.
 # The full modelling pipeline needs requirements-pipeline.txt.
-streamlit>=1.56
-pandas>=2.2
-numpy>=1.26
-plotly>=5.24
+streamlit>=1.56,<2
+pandas>=2.2,<4
+numpy>=1.26,<3
+plotly>=5.24,<8
